@@ -1,9 +1,16 @@
 import React, { useContext } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import UserContext from '../auth/UserContext'; // Ensure this path is correct
 
 function Navigation() {
-  const { user, logout } = useContext(UserContext); // Using the updated context
+  const { user, logout } = useContext(UserContext); 
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogout = (e) => {
+    e.preventDefault();
+    logout(); 
+    navigate('/'); 
+  };
 
   return (
     <nav className="Navigation navbar navbar-expand-md">
@@ -14,7 +21,7 @@ function Navigation() {
             <li className="nav-item mr-4"><NavLink className="nav-link" to="/composers">Composers</NavLink></li>
             <li className="nav-item mr-4"><NavLink className="nav-link" to="/compositions">Compositions</NavLink></li>
             <li className="nav-item mr-4"><NavLink className="nav-link" to="/profile">Profile</NavLink></li>
-            <li className="nav-item"><a className="nav-link" href="/" onClick={(e) => { e.preventDefault(); logout(); }}>Log out {user.username}</a></li>
+            <li className="nav-item"><a className="nav-link" href="/" onClick={handleLogout}>Log out {user.username}</a></li>
           </>
         ) : (
           <>

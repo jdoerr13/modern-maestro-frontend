@@ -28,15 +28,9 @@ class ModernMaestroApi {
 static async login(data) {
   try {
     let res = await this.request("auth/token", data, "post");
-    // Store just the token string
-    localStorage.setItem(TOKEN_STORAGE_ID, res.token);
-    // console.log(res); // To check the entire response structure
- 
-     console.log("res.token from api.js:", res.token); // To specifically check the token
-    // console.log(localStorage.getItem(TOKEN_STORAGE_ID));
-
+    localStorage.removeItem(TOKEN_STORAGE_ID); // Clear existing token
+    localStorage.setItem(TOKEN_STORAGE_ID, res.token); // Store new token
     ModernMaestroApi.token = res.token; // Also set the token for immediate API use
-    // console.log(res.token);//THIS IS WORKING
     return res.token;
   } catch (error) {
     console.error("login failed", error);
@@ -44,12 +38,11 @@ static async login(data) {
   }
 }
 
-// In ModernMaestroApi.register
 static async signup(data) {
   try {
     let res = await this.request("auth/register", data, "post");
-    // Store just the token string
-    localStorage.setItem(TOKEN_STORAGE_ID, res.token);
+    localStorage.removeItem(TOKEN_STORAGE_ID); // Clear existing token
+    localStorage.setItem(TOKEN_STORAGE_ID, res.token); // Store new token
     ModernMaestroApi.token = res.token; // Also set the token for immediate API use
     return res.token;
   } catch (error) {
@@ -57,6 +50,7 @@ static async signup(data) {
     throw error;
   }
 }
+
 
   // Composers
   static async getComposers() {
@@ -69,7 +63,23 @@ static async signup(data) {
     return res.composer;
   }
 
-  // Compositions
+  // Method to create a new composer
+static async createComposer(data) {
+  let res = await this.request("composers", data, "post");
+  return res.composer; // Assuming your API returns the created composer object
+}
+
+// Method to update an existing composer
+static async updateComposer(id, data) {
+  let res = await this.request(`composers/${id}`, data, "patch");
+  return res.composer; // Assuming your API returns the updated composer object
+}
+
+
+
+
+  // Compositions & Instruments
+
   static async getCompositions(filters = {}) {
     let res = await this.request("compositions", filters);
     return res.compositions;
@@ -80,9 +90,14 @@ static async signup(data) {
     return res.composition;
   }
 
-  static async createComposition(data) {
-    let res = await this.request("compositions", data, "post");
-    return res.composition;
+  static async createComposition(compositionData) {
+    try {
+      let res = await this.request("compositions", compositionData, "post");
+      return res;
+    } catch (error) {
+      console.error("Error creating composition:", error);
+      throw error;
+    }
   }
 
   static async updateComposition(id, data) {
@@ -95,6 +110,36 @@ static async signup(data) {
     return res.deleted;
   }
 
+  // Method to get compositions by composer ID
+  static async getCompositionsByComposerId(composerId) {
+    let res = await this.request(`composers/${composerId}/compositions`);
+    return res.compositions;
+  }
+
+  static async getCompositionsWithComposers() {
+    try {
+      const res = await this.request("compositions/with-composers");
+      return res.compositions; // Return compositions directly
+    } catch (error) {
+      console.error("Error fetching compositions with composers:", error);
+      throw new Error("Failed to fetch compositions with composers");
+    }
+  }
+
+  static async getInstruments() {
+    try {
+      let res = await this.request("compositions/instruments");
+      // Check if res.instruments is an array, if not, handle the response accordingly
+      if (!Array.isArray(res.instruments)) {
+        throw new Error("Invalid response format: instruments is not an array");
+      }
+      return res.instruments;
+    } catch (error) {
+      console.error("Error fetching instruments from compositions:", error);
+      throw new Error("Failed to fetch instruments");
+    }
+  }
+  
 
   // Performances
   static async getPerformances(filters = {}) {

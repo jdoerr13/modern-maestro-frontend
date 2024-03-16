@@ -8,14 +8,19 @@ function Home() {
   return (
     <div className="Homepage">
       <div className="container">
-        <h1 className="mb-4">Welcome to Modern Maestro!</h1>
-        <p className="lead">Explore the new world of classical music with Modern Maestro.</p>
+      
+      
         {user ? (
-          <h2>Welcome Back, {user.username}!</h2>
+          <div>
+            <h2>Welcome Back, {user.username}!</h2>
+            <p className="lead">Explore the new world of classical music with Modern Maestro.</p>
+          </div>
         ) : (
           <div>
-            <Link className="button" to="/login">Log in</Link>
-            <Link className="button" to="/signup">Sign up</Link>
+            <h1 className="mb-4">Welcome to Modern Maestro!</h1>
+            <p className="lead">Explore the new world of classical music with Modern Maestro.</p>
+              <Link className="button" to="/login">Log in</Link>
+              <Link className="button" to="/signup">Sign up</Link>
           </div>
         )}
       </div>

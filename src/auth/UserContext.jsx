@@ -1,7 +1,10 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import ModernMaestroApi from '../api/api'; // Adjust the path as necessary
 
 const UserContext = createContext();
+
+// Define a constant for your token storage key
+const TOKEN_STORAGE_ID = 'modernmaestro-token';
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -11,7 +14,7 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   const decodeJWT = () => {
-    const token = localStorage.getItem('modernmaestro-token');
+    const token = localStorage.getItem(TOKEN_STORAGE_ID);
     if (!token) return;
 
     try {
@@ -32,7 +35,7 @@ export const UserProvider = ({ children }) => {
   const login = async (loginData) => {
     try {
       const token = await ModernMaestroApi.login(loginData);
-      localStorage.setItem('modernmaestro-token', token);
+      localStorage.setItem(TOKEN_STORAGE_ID, token);
       decodeJWT();
     } catch (errors) {
       console.error("Login failed", errors);
@@ -40,7 +43,8 @@ export const UserProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('modernmaestro-token');
+    localStorage.removeItem(TOKEN_STORAGE_ID);
+    localStorage.removeItem('token');
     setUser(null);
     ModernMaestroApi.token = null; // Clear token for API
   };
@@ -48,7 +52,7 @@ export const UserProvider = ({ children }) => {
   const signup = async (signupData) => {
     try {
       const token = await ModernMaestroApi.signup(signupData);
-      localStorage.setItem('modernmaestro-token', token);
+      localStorage.setItem(TOKEN_STORAGE_ID, token);
       decodeJWT();
     } catch (errors) {
       console.error("Signup failed", errors);
@@ -60,6 +64,15 @@ export const UserProvider = ({ children }) => {
       {children}
     </UserContext.Provider>
   );
+};
+
+// Custom hook to use the UserContext
+export const useUserContext = () => {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUserContext must be used within a UserProvider');
+  }
+  return context;
 };
 
 export default UserContext;

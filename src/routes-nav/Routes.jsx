@@ -1,15 +1,36 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom"; // Import Routes
+import { Routes, Route, Navigate } from "react-router-dom"; // Make sure Navigate is included in the import
 import Home from "../Home";
+import UserProfile from "../profile/UserProfile";
 import LoginForm from "../auth/LoginForm";
 import SignupForm from "../auth/SignupForm";
+import ComposerList from "../composers/ComposerList";
+import ComposerDetail from "../composers/ComposerDetail";
+import ComposerForm from "../composers/ComposerForm";
+import CompositionList from "../compositions/CompositionList";
+import CompositionDetail from "../compositions/CompositionDetail";
+import CompositionForm from "../compositions/CompositionForm";
 
-function CustomRoutes({ login, signup }) { // Renamed to avoid conflict
+import { useUserContext } from '../auth/UserContext'; // Adjust the path as necessary
+
+function CustomRoutes() {
+  const { user } = useUserContext();
+
   return (
-    <Routes> {/* Use the Routes component to wrap Route components */}
+    <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/login" element={<LoginForm login={login} />} />
-      <Route path="/signup" element={<SignupForm signup={signup} />} />
+      <Route path="/login" element={<LoginForm />} />
+      <Route path="/signup" element={<SignupForm />} />
+      <Route path="/composers" element={<ComposerList />} />
+      <Route path="/composers/new" element={<ComposerForm />} />
+      <Route path="/composers/:composerId" element={<ComposerDetail />} />
+      <Route path="/composers/:composerId/edit" element={<ComposerForm />} />
+      <Route path="/compositions" element={<CompositionList />} />
+      <Route path="/compositions/new" element={<CompositionForm />} />
+      <Route path="/compositions/:compositionId" element={<CompositionDetail />} />
+      <Route path="/compositions/:compositionId/edit" element={<CompositionForm />} />
+      <Route path="/composers/:composerId/compositions/new" element={<CompositionForm />} />
+      <Route path="/profile" element={user ? <UserProfile /> : <Navigate to="/login" />} />
     </Routes>
   );
 }
