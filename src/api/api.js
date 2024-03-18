@@ -141,16 +141,16 @@ static async updateComposer(id, data) {
   }
   
 
-  // Performances
-  static async getPerformances(filters = {}) {
-    let res = await this.request("performances", filters);
-    return res.performances;
-  }
+  // // Performances
+  // static async getPerformances(filters = {}) {
+  //   let res = await this.request("performances", filters);
+  //   return res.performances;
+  // }
 
-  static async getPerformanceById(id) {
-    let res = await this.request(`performances/${id}`);
-    return res.performance;
-  }
+  // static async getPerformanceById(id) {
+  //   let res = await this.request(`performances/${id}`);
+  //   return res.performance;
+  // }
 
  // User Interactions methods
 
@@ -190,7 +190,12 @@ static async updateComposer(id, data) {
     return res.users;
   }
 
-  static async getCurrentUser(username) {
+  static async getCurrentUser() {
+    let res = await this.request(`users/me`); // Assumes your API has a route returning current user info based on token
+    return res.user;
+  }
+
+  static async getUserByUsername(username) {
     let res = await this.request(`users/${username}`);
     return res.user;
   }
@@ -204,8 +209,40 @@ static async updateComposer(id, data) {
     let res = await this.request(`users/${username}`, {}, "delete");
     return res.deleted;
   }
+  // Method to retrieve composer by user ID
+  static async getComposerByUserId(userId) {
+    try {
+      let res = await this.request(`users/${userId}/composer`);
+      return res.composer;
+    } catch (error) {
+      console.error("Error fetching composer by user ID:", error);
+      throw error;
+    }
+  }
 
+  // Method to create a composer for a user
+  static async createComposerForUser(userId, data) {
+    try {
+      let res = await this.request(`users/${userId}/composer`, data, "post");
+      return res.composer;
+    } catch (error) {
+      console.error("Error creating composer for user:", error);
+      throw error;
+    }
+  }
 
+  // Method to update a composer for a user
+  static async updateComposerForUser(userId, data) {
+    try {
+      let res = await this.request(`users/${userId}/composer`, data, "patch");
+      return res.composer;
+    } catch (error) {
+      console.error("Error updating composer for user:", error);
+      throw error;
+    }
+  }
 }
+
+
 
 export default ModernMaestroApi;

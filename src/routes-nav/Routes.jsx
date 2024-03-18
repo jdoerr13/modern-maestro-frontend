@@ -2,6 +2,7 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom"; // Make sure Navigate is included in the import
 import Home from "../Home";
 import UserProfile from "../profile/UserProfile";
+import UpdateProfileForm from "../profile/UpdateProfileForm";
 import LoginForm from "../auth/LoginForm";
 import SignupForm from "../auth/SignupForm";
 import ComposerList from "../composers/ComposerList";
@@ -30,7 +31,8 @@ function CustomRoutes() {
       <Route path="/compositions/:compositionId" element={<CompositionDetail />} />
       <Route path="/compositions/:compositionId/edit" element={<CompositionForm />} />
       <Route path="/composers/:composerId/compositions/new" element={<CompositionForm />} />
-      <Route path="/profile" element={user ? <UserProfile /> : <Navigate to="/login" />} />
+      <Route path="/profile" element={<UserProfile />} />
+      <Route path="/profile/edit" element={<UpdateProfileForm />} />
     </Routes>
   );
 }
