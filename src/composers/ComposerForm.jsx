@@ -47,7 +47,7 @@ const ComposerForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Convert socialMediaLinks array back to object for submission
+    // Converting socialMediaLinks array back to object for submission
     const socialMediaLinksObject = formData.socialMediaLinks.reduce((acc, { platform, link }) => {
       if (platform && link) acc[platform] = link;
       return acc;
@@ -56,12 +56,16 @@ const ComposerForm = () => {
     const submitData = { ...formData, social_media_links: socialMediaLinksObject };
 
     try {
+      let response;
       if (composerId) {
-        await ModernMaestroApi.updateComposer(composerId, submitData);
+        // Update existing composer
+        response = await ModernMaestroApi.updateComposer(composerId, submitData);
+        navigate(`/composers/${composerId}`);
       } else {
-        await ModernMaestroApi.createComposer(submitData);
+        // Create new composer
+        response = await ModernMaestroApi.createComposer(submitData);
+        navigate(`/composers/${response.composer_id}`);
       }
-      navigate("/composers");
     } catch (error) {
       console.error("Saving composer failed", error);
       setErrors({ submit: error.message || "Error saving composer" });

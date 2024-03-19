@@ -11,6 +11,7 @@ import ComposerForm from "../composers/ComposerForm";
 import CompositionList from "../compositions/CompositionList";
 import CompositionDetail from "../compositions/CompositionDetail";
 import CompositionForm from "../compositions/CompositionForm";
+import ComposerSelection from "../composers/ComposerSelection";
 
 import { useUserContext } from '../auth/UserContext'; // Adjust the path as necessary
 
@@ -27,12 +28,13 @@ function CustomRoutes() {
       <Route path="/composers/:composerId" element={<ComposerDetail />} />
       <Route path="/composers/:composerId/edit" element={<ComposerForm />} />
       <Route path="/compositions" element={<CompositionList />} />
-      <Route path="/compositions/new" element={<CompositionForm />} />
+      {/* <Route path="/compositions/new" element={<CompositionForm />} /> */}
       <Route path="/compositions/:compositionId" element={<CompositionDetail />} />
       <Route path="/compositions/:compositionId/edit" element={<CompositionForm />} />
       <Route path="/composers/:composerId/compositions/new" element={<CompositionForm />} />
       <Route path="/profile" element={<UserProfile />} />
       <Route path="/profile/edit" element={<UpdateProfileForm />} />
+      <Route path="/select-composer" element={<ComposerSelection />} />
     </Routes>
   );
 }

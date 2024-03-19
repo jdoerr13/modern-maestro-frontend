@@ -32,15 +32,14 @@ export const UserProvider = ({ children }) => {
     }
   };
 
-  // You might define fetchUserDetails here or directly within decodeJWT
-  // This function would be responsible for making an API call to the backend
+
+  //  responsible for making an API call to the backend
   const fetchUserDetails = async (username) => {
     try {
       const userDetails = await ModernMaestroApi.getUserByUsername(username);
       setUser(userDetails); // Assuming this API call returns full user details
     } catch (error) {
       console.error("Error fetching user details:", error);
-      // Handle error, possibly by logging out the user if the token is invalid
     }
   };
 
@@ -55,7 +54,7 @@ export const UserProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem(TOKEN_STORAGE_ID);
     setUser(null);
     ModernMaestroApi.token = null; // Clear token for API
   };

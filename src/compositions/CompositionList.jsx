@@ -37,7 +37,7 @@ function CompositionList() {
   return (
     <div>
       <h2>Compositions</h2>
-      {/* Search input field */}
+      <div><Link to="/select-composer">Add New Composition</Link> </div>
       <input
         type="text"
         placeholder="Search compositions..."
@@ -58,7 +58,7 @@ function CompositionList() {
           ))}
         </ul>
       )}
-      <Link to="/compositions/new">Add New Composition</Link> {/* Button to add new composition */}
+      
     </div>
     
   );

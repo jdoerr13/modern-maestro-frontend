@@ -4,7 +4,8 @@ import ModernMaestroApi from '../api/api';
 
 const CompositionForm = ({ onCancel }) => {
   const { state } = useLocation();
-  const { composerId } = state;
+  const { composerId, composerName } = state || {};
+  console.log(state); 
 
   const navigate = useNavigate();
 
@@ -120,6 +121,11 @@ const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => cur
 
   return (
     <form onSubmit={handleSubmit}>
+        {composerName && (
+        <div>
+          <h2>Adding composition for {composerName}</h2>
+        </div>
+      )}
       <div>
         <label htmlFor="title">Title</label>
         <input
