@@ -5,7 +5,7 @@ import ModernMaestroApi from '../api/api';
 const CompositionForm = ({ onCancel }) => {
   const { state } = useLocation();
   const { composerId, composerName } = state || {};
-  console.log(state); 
+  const [audioFile, setAudioFile] = useState(null);
 
   const navigate = useNavigate();
 
@@ -61,6 +61,11 @@ const CompositionForm = ({ onCancel }) => {
     }
   };
 
+    // New handler for file input change
+    const handleFileChange = (event) => {
+      setAudioFile(event.target.files[0]); // Assuming you're only interested in the first file
+    };
+
   const handleInstrumentDoubleClick = (instrument) => {
     setSelectedInstruments([...selectedInstruments, instrument]);
     const updatedInstrumentation = [...formData.instrumentation, instrument];
@@ -75,35 +80,42 @@ const CompositionForm = ({ onCancel }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
-    // Remove duplicate instruments before submitting
-    const uniqueInstruments = [...new Set(formData.instrumentation)];
+    // Create an instance of FormData to handle file uploads alongside other data
+    let submissionFormData = new FormData();
   
-    // Convert MM:SS duration to total seconds for backend compatibility
+    // Append non-file fields to FormData
+    submissionFormData.append("title", formData.title);
+    submissionFormData.append("year", formData.year_of_composition.toString()); // Ensure it's a string
+    submissionFormData.append("description", formData.description);
+    // Append unique instruments as a JSON string
+    const uniqueInstruments = [...new Set(formData.instrumentation)];
+    submissionFormData.append("instrumentation", JSON.stringify(uniqueInstruments));
+    submissionFormData.append("composerId", composerId.toString()); // Ensure it's a string
+  
+    // Handle the duration formatting
     let totalSeconds = 0;
     if (formData.duration.includes(':')) {
       const [minutes, seconds] = formData.duration.split(':').map(Number);
       totalSeconds = minutes * 60 + seconds;
     } else {
-      totalSeconds = parseInt(formData.duration, 10) || 0; // Fallback if not in MM:SS format
+      totalSeconds = parseInt(formData.duration, 10) || 0;
+    }
+    // Append duration in total seconds
+    submissionFormData.append("duration", totalSeconds.toString());
+  
+    // Append the audio file if it exists
+    if (audioFile) {
+      submissionFormData.append('audioFile', audioFile, audioFile.name);
     }
   
-    // Prepare the submission payload with the adjusted duration
-    const submissionPayload = {
-      title: formData.title,
-      year: formData.year_of_composition, // Adjust according to your backend expectations
-      description: formData.description,
-      duration: totalSeconds, // Use the converted duration
-      instrumentation: uniqueInstruments,
-      composerId: parseInt(composerId), // Ensure composerId is included and correctly formatted
-    };
-  
     try {
-      await ModernMaestroApi.createComposition(submissionPayload);
+      // Use the API method for creating a composition with FormData
+      // This method should be adapted to handle multipart/form-data on the server
+      await ModernMaestroApi.createCompositionWithFile(submissionFormData);
       alert('Composition added successfully!');
-      navigate(`/composers/${composerId}`); // Navigate back to composer detail page or a success page
+      navigate(`/composers/${composerId}`);
     } catch (error) {
-      console.error('Error creating composition:', error.message);
-      // Adjust error handling to provide more specific feedback if possible
+      console.error('Error creating composition:', error);
       alert(`Error creating composition: ${error.response?.data?.error || 'Please try again.'}`);
     }
   };
@@ -114,9 +126,9 @@ const CompositionForm = ({ onCancel }) => {
     onCancel();
   };
 
-  const currentYear = new Date().getFullYear();
-const earliestYear = 1900; // Adjust based on your requirements
-const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
+    const currentYear = new Date().getFullYear();
+    const earliestYear = 1900; // Adjust based on your requirements
+    const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
 
 
   return (
@@ -195,6 +207,16 @@ const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => cur
             <li key={index}>{instrument}</li>
           ))}
         </ul>
+      </div>
+      <div>
+        <label htmlFor="audioFile">Audio File</label>
+        <input
+          type="file"
+          id="audioFile"
+          name="audioFile"
+          onChange={handleFileChange}
+          accept="audio/*" // Optionally restrict file types
+        />
       </div>
       <button type="submit">Add Composition</button>
       <button type="button" onClick={handleCancel}>Cancel</button>

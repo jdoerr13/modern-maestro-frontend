@@ -10,10 +10,16 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    decodeJWT();
+    // Define an async function inside the useEffect
+    const decodeAndFetchUser = async () => {
+      await decodeJWT();
+    };
+  
+    // Call the async function
+    decodeAndFetchUser();
   }, []);
 
-  const decodeJWT = () => {
+  const decodeJWT = async () => {
     const token = localStorage.getItem(TOKEN_STORAGE_ID);
     if (!token) return;
 
@@ -24,7 +30,7 @@ export const UserProvider = ({ children }) => {
       const decodedPayload = JSON.parse(window.atob(base64));
 
       if (decodedPayload && decodedPayload.username) {
-        setUser({ username: decodedPayload.username });
+        await fetchUserDetails(decodedPayload.username);
       }
     } catch (error) {
       console.error("Error decoding JWT:", error);
@@ -37,7 +43,16 @@ export const UserProvider = ({ children }) => {
   const fetchUserDetails = async (username) => {
     try {
       const userDetails = await ModernMaestroApi.getUserByUsername(username);
-      setUser(userDetails); // Assuming this API call returns full user details
+      // Here we're assuming the API returns all necessary fields.
+      // You might need to adjust the setUser call based on the actual structure returned.
+      setUser({
+        username: userDetails.username,
+        email: userDetails.email,
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        user_id: userDetails.user_id, // Make sure to include the user_id or equivalent unique identifier
+        password: userDetails.password,
+      });
     } catch (error) {
       console.error("Error fetching user details:", error);
     }
@@ -47,7 +62,7 @@ export const UserProvider = ({ children }) => {
     try {
       const token = await ModernMaestroApi.login(loginData);
       localStorage.setItem(TOKEN_STORAGE_ID, token);
-      decodeJWT();
+      await decodeJWT();
     } catch (errors) {
       console.error("Login failed", errors);
     }
@@ -63,7 +78,7 @@ export const UserProvider = ({ children }) => {
     try {
       const token = await ModernMaestroApi.signup(signupData);
       localStorage.setItem(TOKEN_STORAGE_ID, token);
-      decodeJWT();
+      await decodeJWT();
     } catch (errors) {
       console.error("Signup failed", errors);
     }

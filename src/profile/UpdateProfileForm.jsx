@@ -5,116 +5,120 @@ import ModernMaestroApi from '../api/api';
 
 function UpdateProfileForm() {
     const navigate = useNavigate();
-    const { user: contextUser, setUser: setContextUser } = useUserContext();
-    const [updateField, setUpdateField] = useState(null); // Track which field is being updated
+    const { user: contextUser } = useUserContext();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        user_type: '',
         firstName: '',
         lastName: '',
         password: '',
-              // Add composer-related fields to formData
-              composerName: '',
-              biography: '',
-              website: '',
-              social_media_links: {},
+        isComposer: localStorage.getItem('isComposer') === 'true', // Initialize from local storage
+    });
+    const [isUpdating, setIsUpdating] = useState({
+        username: false,
+        email: false,
+        firstName: false,
+        lastName: false,
+        password: false,
     });
     const [errors, setErrors] = useState([]);
 
-    // Fetch user profile data
     useEffect(() => {
-        const fetchUserProfileAndData = async () => {
-            try {
-                if (contextUser && contextUser.username) {
-                    const fetchedUser = await ModernMaestroApi.getUserByUsername(contextUser.username);
-                    setFormData({
-                        username: fetchedUser.username || '',
-                        email: fetchedUser.email || '',
-                        user_type: fetchedUser.user_type || '', // Assuming user_type is directly accessible
-                        firstName: fetchedUser.firstName || '',
-                        lastName: fetchedUser.lastName || '',
-                        password: '', // Keep password field empty for security reasons
-                    });
-                }
-            } catch (error) {
-                console.error("Could not fetch user profile", error.message);
-            }
-        };
-
-        fetchUserProfileAndData();
-    }, [contextUser]); // Dependency on contextUser to refetch if it changes
-
-    const startUpdate = (field) => {
-        setUpdateField(field);
-    };
+        // Pre-fill the form with current user data
+        if (contextUser) {
+            setFormData({
+                username: contextUser.username || '',
+                email: contextUser.email || '',
+                firstName: contextUser.firstName || '',
+                lastName: contextUser.lastName || '',
+                password: '', // Password shouldn't be pre-filled
+                isComposer: localStorage.getItem('isComposer') === 'true', // Populate from local storage
+            });
+        }
+    }, [contextUser]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(f => ({ ...f, [name]: value }));
+        const { name, value, type, checked } = e.target;
+        const fieldValue = type === 'checkbox' ? checked : value;
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            [name]: fieldValue,
+        }));
+        if (type === 'checkbox') {
+            localStorage.setItem('isComposer', checked); // Update local storage
+        }
     };
 
-    const handleUpdate = async () => {
-        if (!updateField) return;
-
-        const updateData = { [updateField]: formData[updateField] };
-        if (updateField === 'password') {
-            // Prepare password data differently if needed
-        }
-
+    const handleUpdate = async (field) => {
+        console.log(`Updating field: ${field} for user: ${contextUser.username}`, formData[field]);
+        if (!contextUser.userId) return; // Ensure userId is available
         try {
-            const updatedUser = await ModernMaestroApi.updateUser(user.username, updateData);
-            setUser(updatedUser); // Ensure the context is updated correctly
-            setUpdateField(null); // Reset the field being updated
-            alert(`Updated ${updateField} successfully.`);
+            let updateData = {};
+            // Map the field name to the appropriate key in the updateData object
+            switch (field) {
+                case 'isComposer':
+                    updateData = { user_type: formData[field] ? 'composer' : 'normal' };
+                    localStorage.setItem('isComposer', formData[field]); // Update local storage
+                    break;
+                // Add cases for other fields if needed
+                default:
+                    updateData = { [field]: formData[field] };
+            }
+            await ModernMaestroApi.updateUser(contextUser.username, updateData); // Use username for API path
+            setIsUpdating({ ...isUpdating, [field]: false }); // Disable edit mode for this field
+            // Consider re-fetching user details here to update contextUser with new data
         } catch (error) {
-            console.error(`Error updating ${updateField}:`, error);
-            setErrors(prevErrors => [...prevErrors, `Error updating ${updateField}`]);
+            console.error(`Error updating ${field}:`, error);
+            setErrors(prevErrors => [...prevErrors, `Error updating ${field}: ${error.message}`]);
         }
+    };
+
+    const toggleUpdate = (field) => {
+        setIsUpdating(prevIsUpdating => ({
+            ...prevIsUpdating,
+            [field]: !prevIsUpdating[field],
+        }));
     };
 
     return (
-        <div>
-            {/* Iterate over user fields except for preferences */}
-            {['username', 'email', 'user_type', 'firstName', 'lastName'].map(field => (
+        <form onSubmit={(e) => e.preventDefault()}>
+            <h2>Update Profile</h2>
+            {Object.keys(isUpdating).map((field) => (
                 <div key={field}>
-                    {updateField === field ? (
+                    <label>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+                    {isUpdating[field] ? (
                         <>
-                            <input
-                                name={field}
-                                type={field === 'password' ? 'password' : 'text'}
-                                value={formData[field]}
-                                onChange={handleChange}
-                            />
-                            <button onClick={handleUpdate}>Submit</button>
+                            {field === 'isComposer' ? ( // Check if field is isComposer
+                                <input
+                                    type="checkbox"
+                                    name={field}
+                                    checked={formData[field]} // Use checked attribute for checkbox
+                                    onChange={handleChange}
+                                />
+                            ) : (
+                                <input
+                                    type={field === 'password' ? 'password' : 'text'}
+                                    name={field}
+                                    value={formData[field]}
+                                    onChange={handleChange}
+                                />
+                            )}
+                            <button type="button" onClick={() => handleUpdate(field)}>Update</button>
+                            <button type="button" onClick={() => toggleUpdate(field)}>Cancel</button>
                         </>
                     ) : (
                         <>
-                            <span>{`${field}: ${formData[field]}`}</span>
-                            <button onClick={() => startUpdate(field)}>Update {field}</button>
+                            <span>{formData[field]}</span>
+                            <button type="button" onClick={() => toggleUpdate(field)}>Edit</button>
                         </>
                     )}
                 </div>
             ))}
-            {/* Handle password update separately */}
-            {updateField === 'password' ? (
-                <>
-                    <input
-                        name="password"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        placeholder="New password"
-                    />
-                    <button onClick={handleUpdate}>Submit</button>
-                </>
-            ) : (
-                <button onClick={() => startUpdate('password')}>Update Password</button>
-            )}
-            {errors.length > 0 && <div>{errors.join(', ')}</div>}
-        </div>
+            {errors.length > 0 && errors.map((error, index) => <div key={index}>{error}</div>)}
+        </form>
     );
-    
 }
 
 export default UpdateProfileForm;
+
+

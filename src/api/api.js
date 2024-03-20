@@ -9,11 +9,13 @@ class ModernMaestroApi {
 
   static async request(endpoint, data = {}, method = "get") {
     console.debug("API Call:", endpoint, data, method);
-
+  
     const url = `${BASE_URL}/${endpoint}`;
-    const headers = { Authorization: `Bearer ${ModernMaestroApi.token}` };
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`, // Get the token from localStorage
+    };
     const params = method === "get" ? data : {};
-
+  
     try {
       return (await axios({ url, method, data, params, headers })).data;
     } catch (err) {
@@ -23,34 +25,54 @@ class ModernMaestroApi {
     }
   }
 
+/**
+     * Creates a new composition, including uploading an audio file.
+     * @param {FormData} formData The composition data and the file to be uploaded.
+     */
+  static async createCompositionWithFile(formData) {
+    const url = `${BASE_URL}/compositions`; // Adjust if your endpoint is different
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`,
+      // Don't set Content-Type for FormData; Axios will set it correctly for multipart/form-data.
+    };
 
-// In ModernMaestroApi.login
-static async login(data) {
-  try {
-    let res = await this.request("auth/token", data, "post");
-    localStorage.removeItem(TOKEN_STORAGE_ID); // Clear existing token
-    localStorage.setItem(TOKEN_STORAGE_ID, res.token); // Store new token
-    ModernMaestroApi.token = res.token; // Also set the token for immediate API use
-    return res.token;
-  } catch (error) {
-    console.error("login failed", error);
-    throw error;
+    try {
+      // Note: Axios will automatically detect FormData and set the appropriate headers.
+      const response = await axios.post(url, formData, { headers });
+      return response.data;
+    } catch (err) {
+      console.error("API Error (createCompositionWithFile):", err.response);
+      let message = err.response.data.error.message;
+      throw Array.isArray(message) ? message : [message];
+    }
   }
-}
 
-static async signup(data) {
-  try {
-    let res = await this.request("auth/register", data, "post");
-    localStorage.removeItem(TOKEN_STORAGE_ID); // Clear existing token
-    localStorage.setItem(TOKEN_STORAGE_ID, res.token); // Store new token
-    ModernMaestroApi.token = res.token; // Also set the token for immediate API use
-    return res.token;
-  } catch (error) {
-    console.error("signup failed", error);
-    throw error;
+
+  static async login(data) {
+    try {
+      let res = await this.request("auth/token", data, "post");
+      localStorage.removeItem(TOKEN_STORAGE_ID); // Clear existing token
+      localStorage.setItem(TOKEN_STORAGE_ID, res.token); // Store new token
+      ModernMaestroApi.token = res.token; // Also set the token for immediate API use
+      return res.token;
+    } catch (error) {
+      console.error("login failed", error);
+      throw error;
+    }
   }
-}
 
+  static async signup(data) {
+    try {
+      let res = await this.request("auth/register", data, "post");
+      localStorage.removeItem(TOKEN_STORAGE_ID); // Clear existing token
+      localStorage.setItem(TOKEN_STORAGE_ID, res.token); // Store new token
+      ModernMaestroApi.token = res.token; // Also set the token for immediate API use
+      return res.token;
+    } catch (error) {
+      console.error("signup failed", error);
+      throw error;
+    }
+  }
 
   // Composers
   static async getComposers() {
@@ -152,8 +174,10 @@ static async updateComposer(id, data) {
   //   return res.performance;
   // }
 
- // User Interactions methods
 
+
+
+ // User Interactions methods
   /** Get all user interactions */
   static async getUserInteractions() {
     let res = await this.request("userInteractions");
@@ -220,6 +244,21 @@ static async updateComposer(id, data) {
     }
   }
 
+
+  static async updateUserType(userId, isComposer) {
+    try {
+      // Adjusting to send the required structure
+      const res = await axios.patch(`users/${userId}/composer`, {
+        isComposer,
+        composerDetails: isComposer ? {} : null, // Sending empty details if composer, null if reverting to normal
+      });
+      return res.data;
+    } catch (error) {
+      console.error(`Failed to update user type: ${error.response ? error.response.data.error : error.message}`);
+      throw error;
+    }
+  }
+
   // Method to create a composer for a user
   static async createComposerForUser(userId, data) {
     try {
@@ -235,7 +274,7 @@ static async updateComposer(id, data) {
   static async updateComposerForUser(userId, data) {
     try {
       let res = await this.request(`users/${userId}/composer`, data, "patch");
-      return res.composer;
+      return res.user;
     } catch (error) {
       console.error("Error updating composer for user:", error);
       throw error;

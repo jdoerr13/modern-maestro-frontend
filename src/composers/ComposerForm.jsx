@@ -17,6 +17,7 @@ const ComposerForm = () => {
     const fetchComposer = async () => {
       if (composerId) {
         const composer = await ModernMaestroApi.getComposerById(composerId);
+        console.log(composer);
         const socialMediaLinks = Object.entries(composer.social_media_links || {}).map(([platform, link]) => ({ platform, link }));
         setFormData({ ...composer, socialMediaLinks: socialMediaLinks.length > 0 ? socialMediaLinks : [{ platform: '', link: '' }] });
       }
@@ -52,25 +53,36 @@ const ComposerForm = () => {
       if (platform && link) acc[platform] = link;
       return acc;
     }, {});
-
-    const submitData = { ...formData, social_media_links: socialMediaLinksObject };
-
+  
+    // // Get the user_id from wherever it's available in your application
+    // const user_id = formData.user_id;
+  
+    const submitData = { 
+      name: formData.name,
+      biography: formData.biography,
+      website: formData.website,
+      social_media_links: socialMediaLinksObject,
+      user_id: formData.user_id 
+    };
+  
     try {
       let response;
       if (composerId) {
-        // Update existing composer
         response = await ModernMaestroApi.updateComposer(composerId, submitData);
+        console.log("Response:", response);
         navigate(`/composers/${composerId}`);
       } else {
-        // Create new composer
         response = await ModernMaestroApi.createComposer(submitData);
         navigate(`/composers/${response.composer_id}`);
       }
     } catch (error) {
       console.error("Saving composer failed", error);
-      setErrors({ submit: error.message || "Error saving composer" });
+      // Extracting error message more reliably
+      const errorMessage = error.response?.data?.error || error.message || "Error saving composer";
+      setErrors({ submit: errorMessage });
     }
-  };
+};
+  
 
   return (
     <form onSubmit={handleSubmit}>

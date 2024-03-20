@@ -45,6 +45,14 @@ function CompositionDetail() {
       <p>Instrumentation: {JSON.stringify(composition.instrumentation)}</p> {/* Assuming instrumentation is an object or array */}
       {/* Display the composer's name */}
       <p>Composed by: {composition.composer}</p>
+      {composition.audio_file_path && (
+  <div>
+    <p>Audio file:</p>
+    <audio controls src={composition.audio_file_path}>
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+)}
       {/* Link back to the composer's detail page */}
       {composition.composer_id && (
         <Link to={`/composers/${composition.composer_id}`}>View Composer</Link>
