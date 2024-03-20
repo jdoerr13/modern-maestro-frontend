@@ -10,22 +10,22 @@ function CompositionDetail() {
   useEffect(() => {
     const fetchCompositionDetails = async () => {
       try {
-        if (compositionId) {
-          const fetchedComposition = await ModernMaestroApi.getCompositionById(compositionId);
-          const composerId = fetchedComposition.composer_id;
-          const composer = await ModernMaestroApi.getComposerById(composerId);
-          
-          // Combine composition data with composer name
-          const compositionWithComposer = {
-            ...fetchedComposition,
-            composer: composer.name
-          };
+        if (!compositionId) return;
 
-          setComposition(compositionWithComposer);
-        }
+        const fetchedComposition = await ModernMaestroApi.getCompositionById(compositionId);
+        if (!fetchedComposition) throw new Error('Composition not found');
+
+        const composer = await ModernMaestroApi.getComposerById(fetchedComposition.composer_id);
+        if (!composer) throw new Error('Composer not found');
+
+        // Assuming your backend server is at 'http://localhost:3000' and it serves
+        // files from the 'uploads' directory accessible via '/uploads/filename'
+        const audioUrl = fetchedComposition.audio_file_path ? `http://localhost:3000/uploads/${fetchedComposition.audio_file_path.split('/').pop()}` : '';
+
+        setComposition({ ...fetchedComposition, composer: composer.name, audioUrl });
       } catch (error) {
-        console.error("Failed to fetch composition details", error);
-        navigate('/compositions'); // Redirect or handle error
+        console.error("Failed to fetch composition details:", error);
+        navigate('/compositions'); // Navigate to compositions list on error
       }
     };
 
@@ -36,6 +36,7 @@ function CompositionDetail() {
     return <div>Loading...</div>;
   }
 
+
   return (
     <div>
       <h2>{composition.title}</h2>
@@ -45,10 +46,12 @@ function CompositionDetail() {
       <p>Instrumentation: {JSON.stringify(composition.instrumentation)}</p> {/* Assuming instrumentation is an object or array */}
       {/* Display the composer's name */}
       <p>Composed by: {composition.composer}</p>
-      {composition.audio_file_path && (
-  <div>
-    <p>Audio file:</p>
-    <audio controls src={composition.audio_file_path}>
+
+      
+      {composition.audioUrl && (
+        <div>
+          <p>Audio file:</p>
+          <audio controls src={composition.audioUrl}>
       Your browser does not support the audio element.
     </audio>
   </div>
