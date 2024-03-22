@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
+import { useUserContext } from '../auth/UserContext';
 
 function CompositionDetail() {
   const { compositionId } = useParams();
   const [composition, setComposition] = useState(null);
   const navigate = useNavigate();
+  const { user: currentUser } = useUserContext();
 
   useEffect(() => {
     const fetchCompositionDetails = async () => {
@@ -14,6 +16,7 @@ function CompositionDetail() {
 
         const fetchedComposition = await ModernMaestroApi.getCompositionById(compositionId);
         if (!fetchedComposition) throw new Error('Composition not found');
+        console.log("Fetched Composition:", fetchedComposition); 
 
         const composer = await ModernMaestroApi.getComposerById(fetchedComposition.composer_id);
         if (!composer) throw new Error('Composer not found');
@@ -35,16 +38,22 @@ function CompositionDetail() {
   if (!composition) {
     return <div>Loading...</div>;
   }
-
+  function formatDuration(duration) {
+    if (!duration) return 'Unknown'; // Return a default value if duration is not provided
+    const [minutes, seconds] = duration.split(':').map(Number);
+    if (isNaN(minutes) || isNaN(seconds)) return 'Unknown'; // Return a default value if duration format is invalid
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+  
 
   return (
     <div>
       <h2>{composition.title}</h2>
       <p>Year of Composition: {composition.year_of_composition}</p>
       <p>Description: {composition.description}</p>
-      <p>Duration: {composition.duration}</p>
-      <p>Instrumentation: {JSON.stringify(composition.instrumentation)}</p> {/* Assuming instrumentation is an object or array */}
-      {/* Display the composer's name */}
+      <p>Duration: {formatDuration(composition.duration)}</p>
+      <p>Instrumentation: {Array.isArray(composition.instrumentation) ? composition.instrumentation.join(', ') : ''}</p>
+
       <p>Composed by: {composition.composer}</p>
 
       
@@ -60,7 +69,16 @@ function CompositionDetail() {
       {composition.composer_id && (
         <Link to={`/composers/${composition.composer_id}`}>View Composer</Link>
       )}
-    </div>
+    <div>
+       {/* Add the Edit button here */}
+       <Link
+        to={`/compositions/${compositionId}/edit`}
+        state={{ isEditing: true, compositionId: compositionId, composerId: composition.composer_id  }}
+      >
+        Edit Composition
+      </Link>
+     </div>
+   </div>
   );
 }
 

@@ -47,6 +47,39 @@ class ModernMaestroApi {
     }
   }
 
+  static async updateCompositionWithFile(compositionId, formData) {
+    const url = `${BASE_URL}/compositions/${compositionId}`; // URL to target a specific composition
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`,
+      // Note: Don't set Content-Type for FormData; Axios will set it for multipart/form-data.
+    };
+  
+    try {
+      // Axios will automatically detect FormData and set the appropriate headers for multipart/form-data.
+      const response = await axios.patch(url, formData, { headers });
+      return response.data;
+    } catch (err) {
+      console.error("API Error (updateCompositionWithFile):", err.response);
+      let message = err.response.data.error.message;
+      throw Array.isArray(message) ? message : [message];
+    }
+  }
+  
+  /**
+   * Fetches tracks by artist name from Spotify and processes them.
+   * @param {string} artistName The name of the artist to fetch tracks for.
+   */
+  static async fetchAndProcessTracksByArtist(artistName) {
+    try {
+      // Fetch tracks by artist name from Spotify
+      const tracks = await this.fetchTracksByArtistAndProcess(`artist:${artistName}`);
+      // Process and insert tracks into the database
+      await this.processAndInsertData(tracks, artistName);
+    } catch (error) {
+      console.error("Error fetching and processing tracks:", error);
+      throw error;
+    }
+  }
 
   static async login(data) {
     try {

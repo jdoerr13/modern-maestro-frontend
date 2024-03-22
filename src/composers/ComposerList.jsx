@@ -5,6 +5,7 @@ import ModernMaestroApi from '../api/api';
 function ComposerList() {
   const [composers, setComposers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showAddComposer, setShowAddComposer] = useState(false);
 
   useEffect(() => {
     const fetchComposers = async () => {
@@ -19,6 +20,25 @@ function ComposerList() {
     composer.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+    // Show add composer button if no composers found
+    useEffect(() => {
+      setShowAddComposer(filteredComposers.length === 0);
+    }, [filteredComposers]);
+
+    const handleAddComposer = async () => {
+      try {
+        // Fetch composers from Spotify and process them
+        await ModernMaestroApi.fetchAndProcessTracksByArtist(searchTerm);
+        // Refetch the composers after adding
+        const composers = await ModernMaestroApi.getComposers();
+        setComposers(composers);
+        // Reset search term
+        setSearchTerm('');
+      } catch (error) {
+        console.error('Error adding composer:', error);
+      }
+    };
+
   return (
     <div>
       <h2>Composers</h2>
@@ -30,7 +50,12 @@ function ComposerList() {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
       {filteredComposers.length === 0 ? (
-        <p>No composers found.</p>
+           <div>
+           <p>No composers found.</p>
+           {showAddComposer && (
+             <button onClick={handleAddComposer}>Help us add more composers</button>
+           )}
+         </div>
       ) : (
         <ul>
           {/* Map over filtered composers */}

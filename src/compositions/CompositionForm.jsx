@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
+
 
 const CompositionForm = ({ onCancel }) => {
   const { state } = useLocation();
-  const { composerId, composerName } = state || {};
+  const { compositionId } = useParams()
+  const { composerId, composerName, isEditing } = state || {};
   const [audioFile, setAudioFile] = useState(null);
-
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     title: '',
     year_of_composition: '',
@@ -16,17 +16,54 @@ const CompositionForm = ({ onCancel }) => {
     duration: '',
     instrumentation: [],
     composerId: composerId,
+    audioFile: null, 
   });
-
   const [errors, setErrors] = useState({});
   const [instrumentList, setInstrumentList] = useState([]);
   const [selectedInstruments, setSelectedInstruments] = useState([]);
+  const [originalDuration, setOriginalDuration] = useState('');
 
   useEffect(() => {
-    if (!composerId) {
-      navigate('/');
-    }
-  }, [composerId, navigate]);
+    const fetchCompositionDetails = async () => {
+      if (compositionId) {
+        try {
+          const composition = await ModernMaestroApi.getCompositionById(compositionId);
+          const audioUrl = composition.audio_file_path ? `http://localhost:3000/uploads/${composition.audio_file_path.split('/').pop()}` : '';
+          const durationArray = composition.duration.split(':');
+          const formattedDuration = `${durationArray[0]}:${durationArray[1]}`;
+          
+          console.log("Formatted Duration:", formattedDuration); // Log formatted duration
+          console.log("instrumentation list",composition.instrumentation);
+          // Pre-fill the form state with fetched composition details
+          // const fetchedInstrumentation = Array.isArray(composition.instrumentation) ? composition.instrumentation : (composition.instrumentation ? JSON.parse(composition.instrumentation) : []);
+             // Pre-fill the form state with fetched composition details
+            let fetchedInstrumentation = [];
+            if (Array.isArray(composition.instrumentation)) {
+              fetchedInstrumentation = composition.instrumentation;
+            } else if (composition.instrumentation && composition.instrumentation !== '["Not specified"]') {
+              fetchedInstrumentation = JSON.parse(composition.instrumentation);
+            }
+          setOriginalDuration(formattedDuration);
+          setFormData({
+            title: composition.title,
+            year_of_composition: composition.year_of_composition?.toString() || '',
+            description: composition.description,
+            duration: formattedDuration,
+            instrumentation: fetchedInstrumentation,
+            composerId: composition.composer_id,
+            // audioFile doesn't need to be fetched; handle file uploads separately if allowing file change
+          });
+          setAudioFile(audioUrl);
+          setSelectedInstruments(fetchedInstrumentation);
+        } catch (error) {
+          console.error("Failed to fetch composition details:", error);
+          navigate('/compositions'); 
+        }
+      }
+    };
+
+    fetchCompositionDetails();
+  }, [compositionId, navigate]);
 
   useEffect(() => {
     const fetchInstrumentList = async () => {
@@ -35,11 +72,27 @@ const CompositionForm = ({ onCancel }) => {
         setInstrumentList(instruments);
       } catch (error) {
         console.error('Failed to fetch instruments:', error);
+        setErrors(prevErrors => ({
+          ...prevErrors,
+          instruments: 'Failed to load instruments list.'
+        }));
       }
     };
 
     fetchInstrumentList();
   }, []);
+
+  function calculateTotalSeconds(duration) {
+    if (!duration) return 0;
+    const [minutes, seconds] = duration.split(':').map(Number);
+    return (isNaN(minutes) || isNaN(seconds)) ? 0 : (minutes * 60) + seconds;
+  }
+  
+  // function formatDuration(durationInSeconds) {
+  //   const minutes = Math.floor(durationInSeconds / 60);
+  //   const seconds = durationInSeconds % 60;
+  //   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  // }
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -55,7 +108,6 @@ const CompositionForm = ({ onCancel }) => {
       // Or simply assign the value directly
       setFormData({ ...formData, [name]: value });
     }
-    // Handle other fields normally
     else {
       setFormData({ ...formData, [name]: value });
     }
@@ -73,62 +125,90 @@ const CompositionForm = ({ onCancel }) => {
   };
 
   const handleInstrumentChange = (selectedOptions) => {
-    const selectedInstruments = Array.from(selectedOptions).map((option) => option.value);
-    setFormData({ ...formData, instrumentation: selectedInstruments });
+    // Map over selectedOptions to create an array of selected instrument names
+    const selectedInstruments = Array.from(selectedOptions).map(option => option.value);
+    // Exclude "Not specified" from selected instruments
+    const filteredInstruments = selectedInstruments.filter(instrument => instrument !== "Not specified");
+    // Use a Set to eliminate any duplicates and then spread it into an array
+    const uniqueInstruments = [...new Set([...formData.instrumentation, ...filteredInstruments])];
+  
+    setFormData(formData => ({
+      ...formData,
+      instrumentation: uniqueInstruments,
+    }));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+
   
-    // Create an instance of FormData to handle file uploads alongside other data
-    let submissionFormData = new FormData();
+  // Function to remove a selected instrument
+const handleRemoveInstrument = (instrumentToRemove) => {
+  // Filter out the instrument to remove
+  const updatedSelectedInstruments = selectedInstruments.filter(instrument => instrument !== instrumentToRemove);
+  setSelectedInstruments(updatedSelectedInstruments);
   
-    // Append non-file fields to FormData
-    submissionFormData.append("title", formData.title);
-    submissionFormData.append("year", formData.year_of_composition.toString()); // Ensure it's a string
-    submissionFormData.append("description", formData.description);
-    // Append unique instruments as a JSON string
-    const uniqueInstruments = [...new Set(formData.instrumentation)];
-    submissionFormData.append("instrumentation", JSON.stringify(uniqueInstruments));
-    submissionFormData.append("composerId", composerId.toString()); // Ensure it's a string
-  
-    // Handle the duration formatting
-    let totalSeconds = 0;
-    if (formData.duration.includes(':')) {
-      const [minutes, seconds] = formData.duration.split(':').map(Number);
-      totalSeconds = minutes * 60 + seconds;
+  // Update formData to reflect the change
+  setFormData({ ...formData, instrumentation: updatedSelectedInstruments });
+};
+
+
+
+const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  // Check if duration field has been modified
+  const durationToSubmit = formData.duration.trim() === '' ? originalDuration : formData.duration;
+
+  const cleanInstrumentation = formData.instrumentation.filter(instr => instr && instr !== "Not specified");
+  const totalSeconds = calculateTotalSeconds(durationToSubmit);
+  const submissionFormData = new FormData();
+  submissionFormData.append("title", formData.title);
+  submissionFormData.append("year", formData.year_of_composition.toString());
+  submissionFormData.append("description", formData.description);
+  submissionFormData.append("instrumentation", JSON.stringify(cleanInstrumentation));
+  submissionFormData.append("composerId", formData.composerId.toString());
+  if (audioFile) submissionFormData.append('audioFile', audioFile, audioFile.name);
+
+  // Only append the duration field if it has been modified
+  if (formData.duration !== originalDuration) {
+    submissionFormData.append("duration", totalSeconds.toString()); 
+  }
+
+  try {
+    let response;
+    if (isEditing) {
+      response = await ModernMaestroApi.updateCompositionWithFile(compositionId, submissionFormData);
     } else {
-      totalSeconds = parseInt(formData.duration, 10) || 0;
+      response = await ModernMaestroApi.createCompositionWithFile(submissionFormData);
     }
-    // Append duration in total seconds
-    submissionFormData.append("duration", totalSeconds.toString());
-  
-    // Append the audio file if it exists
-    if (audioFile) {
-      submissionFormData.append('audioFile', audioFile, audioFile.name);
-    }
-  
-    try {
-      // Use the API method for creating a composition with FormData
-      // This method should be adapted to handle multipart/form-data on the server
-      await ModernMaestroApi.createCompositionWithFile(submissionFormData);
-      alert('Composition added successfully!');
-      navigate(`/composers/${composerId}`);
-    } catch (error) {
-      console.error('Error creating composition:', error);
-      alert(`Error creating composition: ${error.response?.data?.error || 'Please try again.'}`);
-    }
-  };
-  
-  
+    // Assuming the API response includes the id directly or within a composition object
+    const navigateCompositionId = response.compositionId || response.composition?.compositionId || compositionId;
+    navigate(`/compositions/${navigateCompositionId}`);
+  } catch (error) {
+    console.error('Error saving composition:', error);
+    alert(`Error saving composition: ${error?.response?.data?.error || 'Please try again.'}`);
+  }
+};
+
+
+// Update the render of selected instruments to include a remove option
+const renderSelectedInstruments = () => (
+  <ul>
+    {selectedInstruments.map((instrument, index) => (
+      <li key={index}>
+        {instrument}
+        <button type="button" onClick={() => handleRemoveInstrument(instrument)}>Remove</button>
+      </li>
+    ))}
+  </ul>
+);
 
   const handleCancel = () => {
     onCancel();
   };
-
     const currentYear = new Date().getFullYear();
     const earliestYear = 1900; // Adjust based on your requirements
     const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
+
 
 
   return (
@@ -151,12 +231,12 @@ const CompositionForm = ({ onCancel }) => {
       <div>
         <label htmlFor="year">Year Composed</label>
         <select
-  id="year_of_composition"
-  name="year_of_composition"
-  value={formData.year_of_composition}
-  onChange={handleChange}
-  required
->
+        id="year_of_composition"
+        name="year_of_composition"
+        value={formData.year_of_composition}
+        onChange={handleChange}
+        required
+      >
   <option value="">Select a Year</option>
   {years.map(year => (
     <option key={year} value={year}>{year}</option>
@@ -180,8 +260,8 @@ const CompositionForm = ({ onCancel }) => {
           value={formData.duration}
           onChange={handleChange}
           placeholder="MM:SS" // Guide text
-          pattern="[0-5][0-9]:[0-5][0-9]" // Simple pattern to match the MM:SS format
-          title="Duration in minutes and seconds (MM:SS)"
+          pattern="(?:[0-5]?[0-9]):[0-5][0-9]" // Updated pattern
+          title="Duration in minutes and seconds (MM:SS or M:SS)"
         />
       </div>
       <div>
@@ -202,6 +282,7 @@ const CompositionForm = ({ onCancel }) => {
       </div>
       <div>
         <label>Selected Instruments</label>
+        {renderSelectedInstruments()}
         <ul>
           {selectedInstruments.map((instrument, index) => (
             <li key={index}>{instrument}</li>
@@ -217,8 +298,14 @@ const CompositionForm = ({ onCancel }) => {
           onChange={handleFileChange}
           accept="audio/*" // Optionally restrict file types
         />
+        {/* Conditionally render the audio player if editing and an audio file exists */}
+  {isEditing && audioFile && (
+    <audio controls src={audioFile}>
+      Your browser does not support the audio element.
+    </audio>
+  )}
       </div>
-      <button type="submit">Add Composition</button>
+      <button type="submit">{isEditing ? 'Update Composition' : 'Add Composition'}</button>
       <button type="button" onClick={handleCancel}>Cancel</button>
       {errors.submit && <div>{errors.submit}</div>}
     </form>
