@@ -24,7 +24,55 @@ class ModernMaestroApi {
       throw Array.isArray(message) ? message : [message];
     }
   }
+  /**
+   * Adds a single track for a specific composer to the database.
+   * 
+   * @param {Object} trackData - The data for the track to add.
+   * @returns {Promise<Object>} The added track object from the response.
+   */
+  static async addTrackToComposer(trackData) {
+    try {
+      const url = `${this.baseUrl}/compositions`; // Assuming the endpoint for adding a track is '/compositions'
+      const headers = {
+        'Authorization': `Bearer ${this.token}`, // If authentication is required
+        'Content-Type': 'application/json',
+      };
 
+      const response = await axios.post(url, JSON.stringify(trackData), { headers });
+      return response.data;
+    } catch (error) {
+      console.error("Error in addTrackToComposer:", error.response || error);
+      throw error; // Rethrow so it can be caught and handled by the calling function
+    }
+  }
+
+
+// /**
+//  * Adds all tracks for a specific composer to the database.
+//  * @param {Array} tracks The array of track objects.
+//  * @param {Number} composerId The ID of the composer to which the tracks belong.
+//  */
+// static async addAllTracksForComposer(tracks, composerId) {
+//   const results = [];
+//   for (const track of tracks) {
+//     const formData = new FormData();
+//     formData.append("title", track.name);
+//     formData.append("year_of_composition", track.year);
+//     formData.append("description", "Imported from Spotify"); // Example description
+//     formData.append("duration", track.duration);
+//     formData.append("instrumentation", JSON.stringify(track.instrumentation || ["Not specified"]));
+//     formData.append("composerId", composerId);
+
+//     try {
+//       const result = await this.createCompositionWithFile(formData);
+//       results.push(result);
+//     } catch (err) {
+//       console.error("Failed to add track:", track.name, err);
+//       // Optionally handle individual track failures, e.g., by accumulating errors.
+//     }
+//   }
+//   return results;
+// }
 /**
      * Creates a new composition, including uploading an audio file.
      * @param {FormData} formData The composition data and the file to be uploaded.
@@ -65,21 +113,34 @@ class ModernMaestroApi {
     }
   }
   
-  /**
-   * Fetches tracks by artist name from Spotify and processes them.
-   * @param {string} artistName The name of the artist to fetch tracks for.
-   */
-  static async fetchAndProcessTracksByArtist(artistName) {
+
+
+
+
+
+  static async fetchTracksByComposerName(composerName) {
     try {
-      // Fetch tracks by artist name from Spotify
-      const tracks = await this.fetchTracksByArtistAndProcess(`artist:${artistName}`);
-      // Process and insert tracks into the database
-      await this.processAndInsertData(tracks, artistName);
+      let res = await this.request(`composers/tracks/byComposer/${composerName}`);
+      // Ensure res.tracks is always an array
+      return Array.isArray(res.tracks) ? res.tracks : [];
     } catch (error) {
-      console.error("Error fetching and processing tracks:", error);
-      throw error;
+      console.error("Error fetching tracks by composer name:", error);
+      return []; // Return an empty array on error
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   static async login(data) {
     try {

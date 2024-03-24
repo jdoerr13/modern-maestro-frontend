@@ -20,6 +20,7 @@ function ComposerDetail() {
       try {
         if (composerId) {
           const fetchedComposer = await ModernMaestroApi.getComposerById(composerId);
+          console.log("Fetched Composer:", fetchedComposer);
           setComposer(fetchedComposer);
           setIsLoading(false);
           console.log("Fetched Composer:", fetchedComposer);
@@ -71,6 +72,7 @@ function ComposerDetail() {
           <strong>{platform}:</strong> <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
         </li>
                   ))}
+                  
                 </ul>
               </>
             )}

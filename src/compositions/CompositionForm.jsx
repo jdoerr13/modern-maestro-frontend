@@ -88,11 +88,12 @@ const CompositionForm = ({ onCancel }) => {
     return (isNaN(minutes) || isNaN(seconds)) ? 0 : (minutes * 60) + seconds;
   }
   
-  // function formatDuration(durationInSeconds) {
-  //   const minutes = Math.floor(durationInSeconds / 60);
-  //   const seconds = durationInSeconds % 60;
-  //   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  // }
+  function formatDuration(durationInSeconds) {
+    const minutes = Math.floor(durationInSeconds / 60);
+    const seconds = durationInSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  }
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -160,6 +161,9 @@ const handleSubmit = async (event) => {
 
   const cleanInstrumentation = formData.instrumentation.filter(instr => instr && instr !== "Not specified");
   const totalSeconds = calculateTotalSeconds(durationToSubmit);
+  // Format the duration string in the required format ("00:00" or "0:00")
+  const formattedDuration = formatDuration(totalSeconds);
+
   const submissionFormData = new FormData();
   submissionFormData.append("title", formData.title);
   submissionFormData.append("year", formData.year_of_composition.toString());
@@ -168,9 +172,9 @@ const handleSubmit = async (event) => {
   submissionFormData.append("composerId", formData.composerId.toString());
   if (audioFile) submissionFormData.append('audioFile', audioFile, audioFile.name);
 
-  // Only append the duration field if it has been modified
+   // Only append the duration field if it has been modified
   if (formData.duration !== originalDuration) {
-    submissionFormData.append("duration", totalSeconds.toString()); 
+    submissionFormData.append("duration", formattedDuration); 
   }
 
   try {

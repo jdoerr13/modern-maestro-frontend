@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
+// Import the new component at the top of your file
+import ComposerTrackSearch from './ComposerTrackSearch';
 
 function ComposerList() {
   const [composers, setComposers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddComposer, setShowAddComposer] = useState(false);
+  const [showTrackSearch, setShowTrackSearch] = useState(false);
 
   useEffect(() => {
     const fetchComposers = async () => {
@@ -25,37 +28,25 @@ function ComposerList() {
       setShowAddComposer(filteredComposers.length === 0);
     }, [filteredComposers]);
 
-    const handleAddComposer = async () => {
-      try {
-        // Fetch composers from Spotify and process them
-        await ModernMaestroApi.fetchAndProcessTracksByArtist(searchTerm);
-        // Refetch the composers after adding
-        const composers = await ModernMaestroApi.getComposers();
-        setComposers(composers);
-        // Reset search term
-        setSearchTerm('');
-      } catch (error) {
-        console.error('Error adding composer:', error);
-      }
-    };
-
   return (
     <div>
       <h2>Composers</h2>
       {/* Search input field */}
+      <div><Link to="/composers/new">Add New Composer</Link></div>
       <input
         type="text"
         placeholder="Search composers..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      {filteredComposers.length === 0 ? (
-           <div>
-           <p>No composers found.</p>
-           {showAddComposer && (
-             <button onClick={handleAddComposer}>Help us add more composers</button>
-           )}
-         </div>
+       {filteredComposers.length === 0 ? (
+        <div>
+          <p>No composers found. Please click below to search online.</p>
+          {showAddComposer && !showTrackSearch && ( // Check if track search is not shown
+            <button onClick={() => setShowTrackSearch(true)}>Help us add more composers</button>
+          )}
+          {showTrackSearch && <ComposerTrackSearch />}
+        </div>
       ) : (
         <ul>
           {/* Map over filtered composers */}
@@ -66,7 +57,7 @@ function ComposerList() {
           ))}
         </ul>
       )}
-      <Link to="/composers/new">Add New Composer</Link>
+    
     </div>
   );
 }

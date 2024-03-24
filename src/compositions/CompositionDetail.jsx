@@ -7,6 +7,7 @@ function CompositionDetail() {
   const { compositionId } = useParams();
   const [composition, setComposition] = useState(null);
   const navigate = useNavigate();
+  const [tracks, setTracks] = useState([]);
   const { user: currentUser } = useUserContext();
 
   useEffect(() => {
@@ -24,8 +25,11 @@ function CompositionDetail() {
         // Assuming your backend server is at 'http://localhost:3000' and it serves
         // files from the 'uploads' directory accessible via '/uploads/filename'
         const audioUrl = fetchedComposition.audio_file_path ? `http://localhost:3000/uploads/${fetchedComposition.audio_file_path.split('/').pop()}` : '';
-
         setComposition({ ...fetchedComposition, composer: composer.name, audioUrl });
+
+        //  // Fetch and set tracks by composer's name
+        //  const tracksByComposer = await ModernMaestroApi.fetchTracksByComposerName(composer.name);
+        //  setTracks(tracksByComposer); // Assuming this returns an array of track details
       } catch (error) {
         console.error("Failed to fetch composition details:", error);
         navigate('/compositions'); // Navigate to compositions list on error
@@ -35,9 +39,34 @@ function CompositionDetail() {
     fetchCompositionDetails();
   }, [compositionId, navigate]);
 
+  useEffect(() => {
+    if (!composition) return; // Exit early if composition isn't defined yet
+
+    const fetchTracks = async () => {
+        try {
+            // Fetch tracks by composer's name
+            const tracksByComposer = await ModernMaestroApi.fetchTracksByComposerName(composition.composer);
+            console.log(tracksByComposer);
+
+            // Filter out the tracks that match the composition's name
+            const matchingTracks = tracksByComposer.filter(track => track.name === composition.title);
+            
+            setTracks(matchingTracks); // Set the filtered tracks
+        } catch (error) {
+            console.error("Failed to fetch tracks by composer:", error);
+            // Handle error if needed
+        }
+    };
+
+    fetchTracks();
+}, [composition]);
+
+
   if (!composition) {
     return <div>Loading...</div>;
   }
+
+
   function formatDuration(duration) {
     if (!duration) return 'Unknown'; // Return a default value if duration is not provided
     const [minutes, seconds] = duration.split(':').map(Number);
@@ -46,17 +75,27 @@ function CompositionDetail() {
   }
   
 
+
   return (
     <div>
       <h2>{composition.title}</h2>
+      <p>Composed by: {composition.composer}</p>
       <p>Year of Composition: {composition.year_of_composition}</p>
       <p>Description: {composition.description}</p>
       <p>Duration: {formatDuration(composition.duration)}</p>
       <p>Instrumentation: {Array.isArray(composition.instrumentation) ? composition.instrumentation.join(', ') : ''}</p>
-
-      <p>Composed by: {composition.composer}</p>
-
       
+      {tracks.map((track, index) => (
+  <div key={index}>
+    {track.preview_url && (
+      <p>
+        <strong>Listen Here:</strong>
+        <a href={track.preview_url} target="_blank" rel="noopener noreferrer">Preview</a>
+      </p>
+    )}
+  </div>
+))}
+
       {composition.audioUrl && (
         <div>
           <p>Audio file:</p>

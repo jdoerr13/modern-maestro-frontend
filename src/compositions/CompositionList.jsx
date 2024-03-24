@@ -45,7 +45,7 @@ function CompositionList() {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
       {filteredCompositions.length === 0 ? (
-        <p>No compositions found.</p>
+        <p>No compositions found. </p>
       ) : (
         <ul>
           {/* Map over filtered compositions */}
