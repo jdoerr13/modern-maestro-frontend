@@ -10,7 +10,11 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Define an async function inside the useEffect
+    const storedUserDetails = localStorage.getItem('userDetails');
+    if (storedUserDetails) {
+      setUser(JSON.parse(storedUserDetails));
+    }
+
     const decodeAndFetchUser = async () => {
       await decodeJWT();
     };
@@ -39,20 +43,27 @@ export const UserProvider = ({ children }) => {
   };
 
 
-  //  responsible for making an API call to the backend
   const fetchUserDetails = async (username) => {
     try {
       const userDetails = await ModernMaestroApi.getUserByUsername(username);
-      // Here we're assuming the API returns all necessary fields.
-      // You might need to adjust the setUser call based on the actual structure returned.
       setUser({
         username: userDetails.username,
         email: userDetails.email,
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
-        user_id: userDetails.user_id, // Make sure to include the user_id or equivalent unique identifier
-        password: userDetails.password,
+        user_id: userDetails.user_id,
+        // Avoid storing sensitive information like passwords
       });
+
+      // Store user details in localStorage for persistence
+      localStorage.setItem('userDetails', JSON.stringify({
+        username: userDetails.username,
+        email: userDetails.email,
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        user_id: userDetails.user_id,
+        // Exclude password or sensitive info
+      }));
     } catch (error) {
       console.error("Error fetching user details:", error);
     }
@@ -70,8 +81,9 @@ export const UserProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem(TOKEN_STORAGE_ID);
+    localStorage.removeItem('userDetails'); // Remove user details on logout
     setUser(null);
-    ModernMaestroApi.token = null; // Clear token for API
+    ModernMaestroApi.token = null;
   };
 
   const signup = async (signupData) => {

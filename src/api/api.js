@@ -24,123 +24,9 @@ class ModernMaestroApi {
       throw Array.isArray(message) ? message : [message];
     }
   }
-  /**
-   * Adds a single track for a specific composer to the database.
-   * 
-   * @param {Object} trackData - The data for the track to add.
-   * @returns {Promise<Object>} The added track object from the response.
-   */
-  static async addTrackToComposer(trackData) {
-    try {
-      const url = `${this.baseUrl}/compositions`; // Assuming the endpoint for adding a track is '/compositions'
-      const headers = {
-        'Authorization': `Bearer ${this.token}`, // If authentication is required
-        'Content-Type': 'application/json',
-      };
-
-      const response = await axios.post(url, JSON.stringify(trackData), { headers });
-      return response.data;
-    } catch (error) {
-      console.error("Error in addTrackToComposer:", error.response || error);
-      throw error; // Rethrow so it can be caught and handled by the calling function
-    }
-  }
 
 
-// /**
-//  * Adds all tracks for a specific composer to the database.
-//  * @param {Array} tracks The array of track objects.
-//  * @param {Number} composerId The ID of the composer to which the tracks belong.
-//  */
-// static async addAllTracksForComposer(tracks, composerId) {
-//   const results = [];
-//   for (const track of tracks) {
-//     const formData = new FormData();
-//     formData.append("title", track.name);
-//     formData.append("year_of_composition", track.year);
-//     formData.append("description", "Imported from Spotify"); // Example description
-//     formData.append("duration", track.duration);
-//     formData.append("instrumentation", JSON.stringify(track.instrumentation || ["Not specified"]));
-//     formData.append("composerId", composerId);
-
-//     try {
-//       const result = await this.createCompositionWithFile(formData);
-//       results.push(result);
-//     } catch (err) {
-//       console.error("Failed to add track:", track.name, err);
-//       // Optionally handle individual track failures, e.g., by accumulating errors.
-//     }
-//   }
-//   return results;
-// }
-/**
-     * Creates a new composition, including uploading an audio file.
-     * @param {FormData} formData The composition data and the file to be uploaded.
-     */
-  static async createCompositionWithFile(formData) {
-    const url = `${BASE_URL}/compositions`; // Adjust if your endpoint is different
-    const headers = {
-      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`,
-      // Don't set Content-Type for FormData; Axios will set it correctly for multipart/form-data.
-    };
-
-    try {
-      // Note: Axios will automatically detect FormData and set the appropriate headers.
-      const response = await axios.post(url, formData, { headers });
-      return response.data;
-    } catch (err) {
-      console.error("API Error (createCompositionWithFile):", err.response);
-      let message = err.response.data.error.message;
-      throw Array.isArray(message) ? message : [message];
-    }
-  }
-
-  static async updateCompositionWithFile(compositionId, formData) {
-    const url = `${BASE_URL}/compositions/${compositionId}`; // URL to target a specific composition
-    const headers = {
-      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`,
-      // Note: Don't set Content-Type for FormData; Axios will set it for multipart/form-data.
-    };
-  
-    try {
-      // Axios will automatically detect FormData and set the appropriate headers for multipart/form-data.
-      const response = await axios.patch(url, formData, { headers });
-      return response.data;
-    } catch (err) {
-      console.error("API Error (updateCompositionWithFile):", err.response);
-      let message = err.response.data.error.message;
-      throw Array.isArray(message) ? message : [message];
-    }
-  }
-  
-
-
-
-
-
-  static async fetchTracksByComposerName(composerName) {
-    try {
-      let res = await this.request(`composers/tracks/byComposer/${composerName}`);
-      // Ensure res.tracks is always an array
-      return Array.isArray(res.tracks) ? res.tracks : [];
-    } catch (error) {
-      console.error("Error fetching tracks by composer name:", error);
-      return []; // Return an empty array on error
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
+//********************AUTH******************************* 
 
   static async login(data) {
     try {
@@ -168,15 +54,24 @@ class ModernMaestroApi {
     }
   }
 
-  // Composers
+  // ***************COMPOSERS******************
   static async getComposers() {
     let res = await this.request("composers");
     return res.composers;
   }
 
   static async getComposerById(id) {
-    let res = await this.request(`composers/${id}`);
-    return res.composer;
+    try {
+      let res = await this.request(`composers/${id}`);
+      if (!res.composer) {
+        console.error('Composer not found');
+        return null; // Or however you wish to handle this case
+      }
+      return res.composer;
+    } catch (error) {
+      console.error('Error fetching composer by ID:', error);
+      throw error; // Or return a default value/error message
+    }
   }
 
   // Method to create a new composer
@@ -185,16 +80,62 @@ static async createComposer(data) {
   return res.composer; // Assuming your API returns the created composer object
 }
 
-// Method to update an existing composer
-static async updateComposer(id, data) {
-  let res = await this.request(`composers/${id}`, data, "patch");
-  return res.composer; // Assuming your API returns the updated composer object
+// // Method to update an existing composer
+// static async updateComposer (url, data) {
+//     try {
+//       const response = await axios.patch(url, data);
+//       return response.data;
+//     } catch (error) {
+//       throw error;
+//     }
+//   };
+
+// Assuming baseURL is provided as a parameter to the function
+static async updateComposer (composerId, data) {
+  try {
+    const res = await this.request(`composers/${composerId}`, data, "patch");
+    return res.composer;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+static async fetchTracksByComposerName(composerName) {
+  try {
+    let res = await this.request(`composers/tracks/byComposer/${composerName}`);
+    // Ensure res.tracks is always an array
+    return Array.isArray(res.tracks) ? res.tracks : [];
+  } catch (error) {
+    console.error("Error fetching tracks by composer name:", error);
+    return []; // Return an empty array on error
+  }
 }
 
+  /**
+   * Adds a single track for a specific composer to the database.
+   * 
+   * @param {Object} trackData - The data for the track to add.
+   * @returns {Promise<Object>} The added track object from the response.
+   */
+  static async addTrackToComposer(trackData) {
+    try {
+      const url = `${this.baseUrl}/compositions`; // Assuming the endpoint for adding a track is '/compositions'
+      const headers = {
+        'Authorization': `Bearer ${this.token}`, // If authentication is required
+        'Content-Type': 'application/json',
+      };
+
+      const response = await axios.post(url, JSON.stringify(trackData), { headers });
+      return response.data;
+    } catch (error) {
+      console.error("Error in addTrackToComposer:", error.response || error);
+      throw error; // Rethrow so it can be caught and handled by the calling function
+    }
+  }
 
 
-
-  // Compositions & Instruments
+  //************Compositions & Instruments******************************
 
   static async getCompositions(filters = {}) {
     let res = await this.request("compositions", filters);
@@ -256,8 +197,47 @@ static async updateComposer(id, data) {
     }
   }
   
+  /**
+     * Creates a new composition, including uploading an audio file.
+     * @param {FormData} formData The composition data and the file to be uploaded.
+     */
+  static async createCompositionWithFile(formData) {
+    const url = `${BASE_URL}/compositions`; // Adjust if your endpoint is different
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`,
+      // Don't set Content-Type for FormData; Axios will set it correctly for multipart/form-data.
+    };
 
-  // // Performances
+    try {
+      // Note: Axios will automatically detect FormData and set the appropriate headers.
+      const response = await axios.post(url, formData, { headers });
+      return response.data;
+    } catch (err) {
+      console.error("API Error (createCompositionWithFile):", err.response);
+      let message = err.response.data.error.message;
+      throw Array.isArray(message) ? message : [message];
+    }
+  }
+
+  static async updateCompositionWithFile(compositionId, formData) {
+    const url = `${BASE_URL}/compositions/${compositionId}`; // URL to target a specific composition
+    const headers = {
+      Authorization: `Bearer ${localStorage.getItem(TOKEN_STORAGE_ID)}`,
+      // Note: Don't set Content-Type for FormData; Axios will set it for multipart/form-data.
+    };
+  
+    try {
+      // Axios will automatically detect FormData and set the appropriate headers for multipart/form-data.
+      const response = await axios.patch(url, formData, { headers });
+      return response.data;
+    } catch (err) {
+      console.error("API Error (updateCompositionWithFile):", err.response);
+      let message = err.response.data.error.message;
+      throw Array.isArray(message) ? message : [message];
+    }
+  }
+
+  // // ***************Performances************************
   // static async getPerformances(filters = {}) {
   //   let res = await this.request("performances", filters);
   //   return res.performances;
@@ -271,7 +251,7 @@ static async updateComposer(id, data) {
 
 
 
- // User Interactions methods
+ //************User Interactions methods*****************
   /** Get all user interactions */
   static async getUserInteractions() {
     let res = await this.request("userInteractions");
@@ -302,7 +282,9 @@ static async updateComposer(id, data) {
     return res.deleted;
   }
 
-  // Users
+
+
+  //*********************USERS***********************************
   static async getUsers(filters = {}) {
     let res = await this.request("users", filters);
     return res.users;
@@ -338,11 +320,10 @@ static async updateComposer(id, data) {
     }
   }
 
-
   static async updateUserType(userId, isComposer) {
     try {
       // Adjusting to send the required structure
-      const res = await axios.patch(`users/${userId}/composer`, {
+      const res = await this.request(`users/${userId}/composer`, {
         isComposer,
         composerDetails: isComposer ? {} : null, // Sending empty details if composer, null if reverting to normal
       });
@@ -363,17 +344,23 @@ static async updateComposer(id, data) {
       throw error;
     }
   }
-
-  // Method to update a composer for a user
   static async updateComposerForUser(userId, data) {
+    console.log("updateComposerForUser received data:", data);
+    // Prepare the data to be sent
+    const payload = {
+      isComposer: data.isComposer,
+      composerDetails: data.isComposer ? data.composerDetails : {}, // Send composerDetails or an empty object if not a composer
+    };
+    
     try {
-      let res = await this.request(`users/${userId}/composer`, data, "patch");
-      return res.user;
+      // Note: Ensure BASE_URL is correct and points to your back-end server
+      let res = await this.request(`users/${userId}/composer`, payload, "patch");
+      return res.data; // Assuming the back end responds with the updated user data
     } catch (error) {
       console.error("Error updating composer for user:", error);
       throw error;
     }
-  }
+}
 }
 
 

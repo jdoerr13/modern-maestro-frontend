@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ModernMaestroApi from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
 function ComposerTrackSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -8,6 +9,7 @@ function ComposerTrackSearch() {
   const [composerAdded, setComposerAdded] = useState(false);
   const [composerFound, setComposerFound] = useState(false); // Track if a composer is found
   const [composerId, setComposerId] = useState(null);
+  const navigate = useNavigate();
 
 
   const handleSearch = async () => {
@@ -26,7 +28,7 @@ function ComposerTrackSearch() {
     } catch (error) {
       console.error('Error fetching tracks:', error);
       setErrorMessage('An error occurred while fetching tracks. Please try again.');
-      setComposerFound(false); // Ensure composerFound is reset in case of error
+      setComposerFound(false); //  composerFound is reset in case of error
     }
   };
 
@@ -64,10 +66,9 @@ function standardizeDuration(duration) {
       return duration.length === 4 ? `0${duration}` : duration;
     }
   
-    // Assume duration is in seconds if not in 'MM:SS' format
+    //  duration is in seconds if not in 'MM:SS' format
     let totalSeconds = parseInt(duration, 10); // Safely convert to integer
     if (isNaN(totalSeconds)) {
-    //   console.error("Invalid duration format or value:", duration);
       return "00:00"; // Return a fallback value or handle error as appropriate
     }
     
@@ -84,34 +85,24 @@ function standardizeDuration(duration) {
     }
     try {
       for (const track of tracks) {
-        const formattedDuration = standardizeDuration(track.duration_ms / 1000); // Convert milliseconds to seconds first
-        
-        // const year = parseInt(track.year, 10); // Ensure year is treated as an integer
-        // if (isNaN(year)) {
-        //   console.error("Invalid year format or value for track:", track.name);
-        //   continue; // Skip this track or handle error as appropriate
-        // }
-        const yearOfComposition = new Date(track.year).getFullYear();
-        console.log(yearOfComposition)
+        console.log("Track Data:", track);
         const compositionData = new FormData();
         compositionData.append("title", track.name);
         compositionData.append("composerId", composerId.toString());
         compositionData.append("duration", track.duration.toString());
-        compositionData.append("year", parseInt(yearOfComposition)); // Ensure string format for FormData, even though it's an integer
+        compositionData.append("year", track.year.toString()); 
         compositionData.append("description", track.description);
-        // Other fields like instrumentation are handled elsewhere
   
         await ModernMaestroApi.createCompositionWithFile(compositionData);
       }
-      console.log("All tracks added to the database successfully.");
+      alert("All tracks added to the database successfully.");
+      navigate(`/composers/${composerId}`);
     } catch (error) {
       console.error('Error adding tracks to the database:', error);
     }
   };
   
   
-
-
   return (
     <div>
       <p><strong>Search for a Composer's Music on Spotify Here</strong></p>

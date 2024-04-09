@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom'; 
+import { useParams, useNavigate } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
 import ComposerForm from './ComposerForm';
-import { useUserContext } from '../auth/UserContext';
+import { NavLink } from 'react-router-dom';
 
 function ComposerDetail() {
   const { composerId } = useParams();
   const [composer, setComposer] = useState(null);
   const [compositions, setCompositions] = useState([]);
-  const [isEditing, setIsEditing] = useState(!composerId);
-  const navigate = useNavigate(); 
-  const { user: currentUser } = useUserContext();
-  console.log(currentUser);
+  const [isEditing, setIsEditing] = useState(false); // Initially, not in edit mode
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -20,13 +18,11 @@ function ComposerDetail() {
       try {
         if (composerId) {
           const fetchedComposer = await ModernMaestroApi.getComposerById(composerId);
-          console.log("Fetched Composer:", fetchedComposer);
           setComposer(fetchedComposer);
-          setIsLoading(false);
-          console.log("Fetched Composer:", fetchedComposer);
           const fetchedCompositions = await ModernMaestroApi.getCompositionsByComposerId(composerId);
           setCompositions(fetchedCompositions);
         }
+        setIsLoading(false);
       } catch (error) {
         console.error("Failed to fetch composer details or compositions", error);
         setIsLoading(false);
@@ -39,59 +35,62 @@ function ComposerDetail() {
     return <div>Loading...</div>;
   }
 
-  if (!composer) {
+  if (!composer && !isLoading) {
     return <div>Composer not found.</div>;
   }
 
   const handleAddCompositionClick = () => {
-    if (composerId) {
-      navigate(`/composers/${composerId}/compositions/new`, { state: { composerId, composerName: composer.name }});
-    } else {
-      console.error("No composer ID found.");
-    }
+    navigate(`/composers/${composerId}/compositions/new`, { state: { composerId, composerName: composer?.name }});
   };
-  console.log("currentUser.user_id:", currentUser.user_id);
-  console.log("composer.user_id:", composer.user_id);
+
   return (
     <div>
-      {isEditing ? (
-        <ComposerForm composerId={composerId} setIsEditing={setIsEditing} />
-      ) : (
-        composer && (
-          <>
-            <h2>{composer.name}</h2>
-            <p>Biography: {composer.biography}</p>
-            {composer.website && <p>Website: <a href={composer.website} target="_blank" rel="noopener noreferrer">{composer.website}</a></p>}
+      {/* Only render the ComposerForm if isEditing is true */}
+      {isEditing && (
+        <ComposerForm
+          composerId={composer?.composer_id}
+          setIsEditing={setIsEditing}
+          composerInfo={composer}
+        />
+      )}
 
-            {composer.social_media_links && Object.keys(composer.social_media_links).length > 0 && (
-              <>
-                <p>Social Media Links:</p>
-                <ul>
-                  {Object.entries(composer.social_media_links).map(([platform, link]) => (
-                   <li key={platform}>
-          <strong>{platform}:</strong> <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
-        </li>
-                  ))}
-                  
-                </ul>
-              </>
-            )}
-            <h3>Compositions</h3>
+      {/* Composer's details */}
+      <div style={{ display: isEditing ? 'none' : 'block' }}>
+        <h2>{composer.name}</h2>
+        <p>Biography: {composer.biography}</p>
+        {composer.website && (
+          <p>Website: <a href={composer.website} target="_blank" rel="noopener noreferrer">{composer.website}</a></p>
+        )}
+        {composer.social_media_links && Object.keys(composer.social_media_links).length > 0 && (
+          <div>
+            <p>Social Media Links:</p>
             <ul>
-              {compositions.map(composition => (
-                <li key={composition.composition_id}>
-                  <Link to={`/compositions/${composition.composition_id}`}>{composition.title}</Link>
+              {Object.entries(composer.social_media_links).map(([platform, link]) => (
+                <li key={platform}>
+                  <strong>{platform}:</strong> <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
                 </li>
               ))}
             </ul>
-            <button onClick={handleAddCompositionClick}>Add Composition</button>
-            
-            {(currentUser.user_id === composer.user_id || currentUser.role === 'admin') && (
-              <button type="button" onClick={() => navigate(`/composers/${composerId}/edit`)}>Edit Composer Details</button>
-           )} 
-          </>
-        )
-      )}
+          </div>
+        )}
+        <h3>Compositions</h3>
+        <ul>
+          {compositions.map(composition => (
+            <li key={composition.composition_id}>
+              <NavLink to={`/compositions/${composition.composition_id}`}>{composition.title}</NavLink>
+            </li>
+          ))}
+        </ul>
+        <button onClick={handleAddCompositionClick}>Add Composition</button>
+        {!isEditing && (
+          <button type="button" onClick={() => setIsEditing(true)}>
+            Edit Composer Details
+          </button>
+        )}
+        <NavLink className="nav-link" to="/profile">
+          Back to Profile
+        </NavLink>
+      </div>
     </div>
   );
 }

@@ -1,28 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
 
-const ComposerForm = () => {
+const ComposerForm = ({ user_id, composerId, composerInfo }) => {
+  console.log(composerInfo);
   const navigate = useNavigate();
-  const { composerId } = useParams();
   const [formData, setFormData] = useState({
     name: '',
     biography: '',
     website: '',
-    socialMediaLinks: [{ platform: '', link: '' }], // Initialize with one empty field
+    socialMediaLinks: [{ platform: '', link: '' }],
   });
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
+    if (composerInfo) {
+      setFormData({
+        name: composerInfo.name || '',
+        biography: composerInfo.biography || '',
+        website: composerInfo.website || '',
+        socialMediaLinks: composerInfo.social_media_links
+          ? Object.entries(composerInfo.social_media_links).map(([platform, link]) => ({ platform, link }))
+          : [{ platform: '', link: '' }],
+      });
+    }
+  }, [composerInfo]);
+
+  useEffect(() => {
     const fetchComposer = async () => {
       if (composerId) {
-        const composer = await ModernMaestroApi.getComposerById(composerId);
-        console.log(composer);
-        const socialMediaLinks = Object.entries(composer.social_media_links || {}).map(([platform, link]) => ({ platform, link }));
-        setFormData({ ...composer, socialMediaLinks: socialMediaLinks.length > 0 ? socialMediaLinks : [{ platform: '', link: '' }] });
+        try {
+          const composer = await ModernMaestroApi.getComposerById(composerId);
+          const socialMediaLinks = Object.entries(composer.social_media_links || {}).map(([platform, link]) => ({ platform, link }));
+          setFormData({
+            name: composer.name || '',
+            biography: composer.biography || '',
+            website: composer.website || '',
+            socialMediaLinks: socialMediaLinks.length > 0 ? socialMediaLinks : [{ platform: '', link: '' }]
+          });
+        } catch (error) {
+          console.error('Error fetching composer:', error);
+        }
       }
     };
-    if (composerId) fetchComposer();
+    fetchComposer();
   }, [composerId]);
 
   const handleChange = (event) => {
@@ -48,47 +69,53 @@ const ComposerForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // Converting socialMediaLinks array back to object for submission
-    const socialMediaLinksObject = formData.socialMediaLinks.reduce((acc, { platform, link }) => {
-      if (platform && link) acc[platform] = link;
-      return acc;
-    }, {});
-  
-    // // Get the user_id from wherever it's available in your application
-    // const user_id = formData.user_id;
-  
-    const submitData = { 
-      name: formData.name,
-      biography: formData.biography,
-      website: formData.website,
-      social_media_links: socialMediaLinksObject,
-      user_id: formData.user_id 
-    };
-  
+    
     try {
-      let response;
+      // Constructing the correct URL based on whether composerId exists
+      const apiUrl = composerId ? `${composerId}` : '';
+      
+      // Constructing socialMediaLinks as an object from the array
+      const socialMediaLinksObject = formData.socialMediaLinks.reduce((acc, { platform, link }) => {
+        if (platform && link) acc[platform] = link;
+        return acc;
+      }, {});
+      
+      console.log("NAME:", formData.name);
+      // Preparing the data to update or create the composer's details
+      const submitData = {
+        name: formData.name,
+        biography: formData.biography,
+        website: formData.website,
+        social_media_links: socialMediaLinksObject,
+        user_id: user_id // Ensure you are passing user_id correctly
+      };
+  
       if (composerId) {
-        response = await ModernMaestroApi.updateComposer(composerId, submitData);
-        console.log("Response:", response);
-        navigate(`/composers/${composerId}`);
+        // Update existing composer profile
+        console.log("Updating composer with ID:", composerId, "Data:", submitData);
+        const response = await ModernMaestroApi.updateComposer(apiUrl, submitData);
+        console.log("Composer updated successfully:", response);
+        navigate(`/composers/${composerId}`); // Redirect after successful update
       } else {
-        response = await ModernMaestroApi.createComposer(submitData);
-        navigate(`/composers/${response.composer_id}`);
+        // Create a new composer profile
+        console.log("Creating a new composer with data:", submitData);
+        const response = await ModernMaestroApi.createComposer(apiUrl, submitData);
+        console.log("New composer created successfully:", response);
+        navigate(`/composers/${response.composer_id}`); // Redirect after successful creation
       }
     } catch (error) {
-      console.error("Saving composer failed", error);
-      // Extracting error message more reliably
+      console.error("Failed to save composer:", error);
       const errorMessage = error.response?.data?.error || error.message || "Error saving composer";
       setErrors({ submit: errorMessage });
     }
-};
+  };
   
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <h3>Composer Info</h3>
       <div>
-        <label htmlFor="name">Name</label>
+        <label htmlFor="name">Full Name</label>
         <input id="name" name="name" value={formData.name} onChange={handleChange} required />
       </div>
       <div>
