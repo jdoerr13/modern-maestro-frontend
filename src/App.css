@@ -1,42 +1,306 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+.Homepage {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-image: url('/images/pinkGrades.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.Navigation {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  background-color: rgb(83, 80, 80);
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+.greeting {
+  font-size: 4em; /* Adjust the size as needed */
+  font-weight: bold;
+  color: #333; /* Adjust color if needed */
+  margin-top: 50px; /* Adjust spacing if needed */
+  text-align: center; /* Center the text */
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  75% {
+    transform: translateY(-10px);
+  }
+}
+
+.description {
+  font-size: 1.7em;
+  color: #333;
+  margin-top: 20px;
   text-align: center;
+  display: inline-block;
+
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.description span {
+  display: inline-block;
+  animation: wave 2s infinite;
 }
 
-@keyframes logo-spin {
+.main-content {
+  padding-top: 80px;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.main-header {
+  margin-bottom: 20px;
+  text-align: center;
+  width: 100%;
+}
+
+.swoopIn {
+  padding-top: 80px;
+  animation: swoopIn 1s ease-out forwards;
+  align-items: left;
+}
+
+@keyframes swoopIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateX(-80px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.centered-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.buttons-container {
+  /* margin-bottom: -190px;  */
+}
+
+.music-note {
+  font-size: 2em;
+  display: inline-block;
+  margin: 10px 10px;
+  animation: dance 2s infinite;
+}
+
+@keyframes dance {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-10px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+  75% {
+    transform: translateY(-10px);
   }
 }
 
-.card {
-  padding: 2em;
+.info-block {
+  margin-bottom: 20px;
 }
 
-.read-the-docs {
-  color: #888;
+.tracks-block, .audio-block {
+  margin-bottom: 20px;
+}
+
+.links-block {
+  margin-top: 20px;
+}
+
+h2 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+h5 {
+  margin: 10px 0;
+}
+
+p {
+  margin: 10px 0;
+}
+
+.link-button {
+  color: white;
+  text-decoration: none;
+  border: 2px solid black;
+  padding: 0.5rem 1rem;
+  background-color: transparent;
+  border-radius: 5px;
+  text-transform: uppercase;
+  margin-right: 0.5rem;
+}
+
+.link-button:last-child {
+  margin-right: 0;
+}
+
+.link-button:hover {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+.list-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.list-box {
+  padding: 20px;
+  margin: 10px;
+  flex: 1 0 30%;
+  min-width: 300px;
+  max-width: 33%;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.search-bar {
+  width: 80%;
+  max-width: 400px;
+  padding: 8px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.navbar-brand {
+  font-weight: bold;
+  color: white !important;
+  font-size: 1.2rem;
+}
+
+.nav-link {
+  color: #f8f9fa !important;
+  font-size: 1.2rem;
+}
+
+.nav-link:hover {
+  color: #007bff !important;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+h2, p {
+  margin-bottom: 1rem;
+}
+
+.button, .form-control {
+  margin-top: 0.5rem;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.user-profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.top-header {
+  text-align: center;
+  width: 100%;
+  margin-bottom: 20px;
+  font-size: 2.5em;
+  font-weight: bold;
+  color: #333;
+  animation: fadeIn 2s ease-out;
+}
+
+.boxes-container {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.profile-box, .composer-box, .composition-box {
+  padding: 20px;
+  margin: 10px;
+  flex: 1 0 30%;
+  min-width: 400px;
+  max-width: 33%;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 5px;
+}
+
+/* Centering form within Home component */
+.form-wrapper {
+  margin-top: 0px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: -140px;
 }

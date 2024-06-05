@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
 import ComposerForm from './ComposerForm';
 import { NavLink } from 'react-router-dom';
+import '../App.css';
 
 function ComposerDetail() {
   const { composerId } = useParams();
@@ -44,53 +45,57 @@ function ComposerDetail() {
   };
 
   return (
-    <div>
-      {/* Only render the ComposerForm if isEditing is true */}
-      {isEditing && (
-        <ComposerForm
-          composerId={composer?.composer_id}
-          setIsEditing={setIsEditing}
-          composerInfo={composer}
-        />
+    <div className="main-content"> 
+      {isLoading ? <div>Loading...</div> : null}
+      {!composer && !isLoading ? <div>Composer not found.</div> : null}
+  
+      {composer && (
+        <div>
+          {isEditing ? (
+            <ComposerForm
+              composerId={composer?.composer_id}
+              setIsEditing={setIsEditing}
+              composerInfo={composer}
+            />
+          ) : (
+            <div > 
+                <h1 className="swoopIn">{composer.name}</h1> 
+            
+              <h4>Biography:</h4>
+              <p>{composer.biography}</p>
+              {composer.website && (
+                <div>
+                  <h4>Website:</h4>
+                  <p><a href={composer.website} target="_blank" rel="noopener noreferrer">{composer.website}</a></p>
+                </div>
+              )}
+              {composer.social_media_links && (
+                <div>
+                  <h4>Social Media Links:</h4>
+                  <ul>
+                    {Object.entries(composer.social_media_links).map(([platform, link]) => (
+                      <li key={platform}>
+                        <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <h3>Compositions:</h3>
+              <ul>
+                {compositions.map(composition => (
+                  <li key={composition.composition_id}>
+                    <NavLink to={`/compositions/${composition.composition_id}`}>{composition.title}</NavLink>
+                  </li>
+                ))}
+              </ul>
+              <button onClick={handleAddCompositionClick}>Add Composition</button>
+              <button type="button" onClick={() => setIsEditing(true)}>Edit Composer Details</button>
+              <NavLink to="/profile" className="nav-link">Back to Profile</NavLink>
+            </div>
+          )}
+        </div>
       )}
-
-      {/* Composer's details */}
-      <div style={{ display: isEditing ? 'none' : 'block' }}>
-        <h2>{composer.name}</h2>
-        <p>Biography: {composer.biography}</p>
-        {composer.website && (
-          <p>Website: <a href={composer.website} target="_blank" rel="noopener noreferrer">{composer.website}</a></p>
-        )}
-        {composer.social_media_links && Object.keys(composer.social_media_links).length > 0 && (
-          <div>
-            <p>Social Media Links:</p>
-            <ul>
-              {Object.entries(composer.social_media_links).map(([platform, link]) => (
-                <li key={platform}>
-                  <strong>{platform}:</strong> <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <h3>Compositions</h3>
-        <ul>
-          {compositions.map(composition => (
-            <li key={composition.composition_id}>
-              <NavLink to={`/compositions/${composition.composition_id}`}>{composition.title}</NavLink>
-            </li>
-          ))}
-        </ul>
-        <button onClick={handleAddCompositionClick}>Add Composition</button>
-        {!isEditing && (
-          <button type="button" onClick={() => setIsEditing(true)}>
-            Edit Composer Details
-          </button>
-        )}
-        <NavLink className="nav-link" to="/profile">
-          Back to Profile
-        </NavLink>
-      </div>
     </div>
   );
 }

@@ -76,6 +76,7 @@ export const UserProvider = ({ children }) => {
       await decodeJWT();
     } catch (errors) {
       console.error("Login failed", errors);
+      throw errors;
     }
   };
 
@@ -93,6 +94,7 @@ export const UserProvider = ({ children }) => {
       await decodeJWT();
     } catch (errors) {
       console.error("Signup failed", errors);
+      throw errors;
     }
   };
 

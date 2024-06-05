@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
 
 const ComposerForm = ({ user_id, composerId, composerInfo }) => {
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   console.log(composerInfo);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -95,14 +96,28 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
         console.log("Updating composer with ID:", composerId, "Data:", submitData);
         const response = await ModernMaestroApi.updateComposer(apiUrl, submitData);
         console.log("Composer updated successfully:", response);
-        navigate(`/composers/${composerId}`); // Redirect after successful update
+         // Show success message
+         setShowSuccessMessage(true);
+         setTimeout(() => {
+          setShowSuccessMessage(false);
+        }, 3000); // 3000 milliseconds (3 seconds) in this example
+        navigate(`/composers`); // Redirect after successful update
+
       } else {
         // Create a new composer profile
         console.log("Creating a new composer with data:", submitData);
         const response = await ModernMaestroApi.createComposer(apiUrl, submitData);
         console.log("New composer created successfully:", response);
-        navigate(`/composers/${response.composer_id}`); // Redirect after successful creation
+        navigate(`/composers`); // Redirect after successful creation
       }
+
+            // Show success message
+            setShowSuccessMessage(true);
+
+            // After some time, hide the success message
+            setTimeout(() => {
+              setShowSuccessMessage(false);
+            }, 3000); // 3000 milliseconds (3 seconds) in this example
     } catch (error) {
       console.error("Failed to save composer:", error);
       const errorMessage = error.response?.data?.error || error.message || "Error saving composer";
@@ -113,7 +128,8 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
   
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Composer Info</h3>
+      <h3>Composer Info:</h3>
+      {/* Form fields */}
       <div>
         <label htmlFor="name">Full Name</label>
         <input id="name" name="name" value={formData.name} onChange={handleChange} required />
@@ -147,6 +163,12 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
         <button type="button" onClick={handleAddLink}>Add Link</button>
       </div>
       <button type="submit">Save</button>
+      {/* Success message */}
+      {showSuccessMessage && (
+        <div className="alert alert-success" role="alert">
+          Composer updated successfully!
+        </div>
+      )}
     </form>
   );
 };

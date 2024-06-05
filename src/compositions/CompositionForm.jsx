@@ -219,7 +219,7 @@ const renderSelectedInstruments = () => (
 );
 
   const handleCancel = () => {
-    onCancel();
+    navigate(-1);
   };
 
   const handleDeleteAudioFile = () => {

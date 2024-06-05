@@ -18,7 +18,7 @@ function ComposerTrackSearch() {
       console.log('Fetched Tracks:', fetchedTracks);
 
       if (fetchedTracks.length === 0) {
-        setErrorMessage('No tracks found. Please check your spelling.');
+        setErrorMessage('No composers found. Please check your spelling.');
         setComposerFound(false); // Update state to reflect no composer found
       } else {
         setErrorMessage('');
@@ -77,66 +77,75 @@ function standardizeDuration(duration) {
     
     return `${minutes}:${seconds}`;
   }
-
   const handleAddAllTracksToDatabase = async () => {
     if (!tracks.length || !composerId) {
       console.log("No tracks to add or composer ID missing.");
       return;
     }
-    try {
-      for (const track of tracks) {
-        console.log("Track Data:", track);
+    for (const track of tracks) {
         const compositionData = new FormData();
         compositionData.append("title", track.name);
         compositionData.append("composerId", composerId.toString());
-        compositionData.append("duration", track.duration.toString());
-        compositionData.append("year", track.year.toString()); 
+        compositionData.append("duration", standardizeDuration(track.duration)); // Ensure this conversion is correct
+        compositionData.append("year", track.year.toString());
         compositionData.append("description", track.description);
-  
-        await ModernMaestroApi.createCompositionWithFile(compositionData);
-      }
-      alert("All tracks added to the database successfully.");
-      navigate(`/composers/${composerId}`);
-    } catch (error) {
-      console.error('Error adding tracks to the database:', error);
+
+        // Log data to be sent
+        console.log(`Sending data for track: ${track.name}`, {
+            title: track.name,
+            composerId: composerId,
+            duration: track.duration,
+            year: track.year,
+            description: track.description
+        });
+
+        try {
+            await ModernMaestroApi.createCompositionWithFile(compositionData);
+            console.log("Track added successfully:", track.name);
+        } catch (error) {
+          console.error('API Error:', error.response ? error.response.data : error);
+            if (error.response) {
+                console.error('Detailed error:', error.response.data);
+                // Optionally continue with next tracks or handle error specific actions
+            }
+        }
     }
-  };
-  
-  
-  return (
-    <div>
-      <p><strong>Search for a Composer's Music on Spotify Here</strong></p>
-      <input
-        type="text"
-        placeholder="Confirm Composer Here..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <button onClick={handleSearch}>Search</button>
-      {errorMessage && <p>{errorMessage}</p>}
-      {composerFound && !composerAdded && (
-        <button onClick={handleAddComposerToDatabase}>Add Composer to Database</button>
-      )}
-      {/* Display the composer's name above the track list if a composer has been added */}
-      {composerAdded && (
-        <>
-          <h2>Compositions from {searchTerm}</h2>
-          <button onClick={handleAddAllTracksToDatabase}>Add All Tracks to Database</button>
-        </>
-      )}
-      {Array.isArray(tracks) && tracks.map((track, index) => (
-        <div key={index}>
-          <p><strong>Title:</strong> {track.name}</p>
-          <p><strong>Duration:</strong> {track.duration}</p>
-          <p><strong>Year:</strong> {track.year}</p>
-          <p><strong>Album:</strong> {track.album}</p>
-          {track.preview_url && (
-            <p><strong>Listen Here:</strong> <a href={track.preview_url} target="_blank" rel="noopener noreferrer">Preview</a></p>
-          )}
-        </div>
-      ))}
-    </div>
-  );
+    navigate(`/composers/${composerId}`);
+};
+
+return (
+  <div className="main-content"> {/* Use the main-content class here as well */}
+    <p><strong>Search for a Composer's Music on Spotify Here</strong></p>
+    <input
+      type="text"
+      placeholder="Confirm Composer Here..."
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+    <button onClick={handleSearch}>Search</button>
+    {errorMessage && <p>{errorMessage}</p>}
+    {composerFound && !composerAdded && (
+      <button onClick={handleAddComposerToDatabase}>Add Composer to Database</button>
+    )}
+    {composerAdded && (
+      <>
+        <h2>Compositions from {searchTerm}</h2>
+        <button onClick={handleAddAllTracksToDatabase}>Add All Tracks to Database</button>
+      </>
+    )}
+    {Array.isArray(tracks) && tracks.map((track, index) => (
+      <div key={index}>
+        <p><strong>Title:</strong> {track.name}</p>
+        <p><strong>Duration:</strong> {standardizeDuration(track.duration)}</p> {/* Ensure the correct format is displayed */}
+        <p><strong>Year:</strong> {track.year}</p>
+        <p><strong>Album:</strong> {track.album}</p>
+        {track.preview_url && (
+          <p><strong>Listen Here:</strong> <a href={track.preview_url} target="_blank" rel="noopener noreferrer">Preview</a></p>
+        )}
+      </div>
+    ))}
+  </div>
+);
 }
 
 

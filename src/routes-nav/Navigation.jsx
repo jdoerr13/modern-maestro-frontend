@@ -13,23 +13,25 @@ function Navigation() {
   };
 
   return (
-    <nav className="Navigation navbar navbar-expand-md">
-      {user && <Link className="navbar-brand" to="/">Home</Link>} {/* Conditionally render Home link */}
-      <ul className="navbar-nav ml-auto">
-        {user ? (
-          <>
-            <li className="nav-item mr-4"><NavLink className="nav-link" to="/composers">Composers</NavLink></li>
-            <li className="nav-item mr-4"><NavLink className="nav-link" to="/compositions">Compositions</NavLink></li>
-            <li className="nav-item mr-4"><NavLink className="nav-link" to="/profile">Profile</NavLink></li>
-            <li className="nav-item"><a className="nav-link" href="/" onClick={handleLogout}>Log out {user.username}</a></li>
-          </>
-        ) : (
-          <>
-            <li className="nav-item mr-4"><NavLink className="nav-link" to="/login">Login</NavLink></li>
-            <li className="nav-item mr-4"><NavLink className="nav-link" to="/signup">Sign Up</NavLink></li>
-          </>
-        )}
-      </ul>
+    <nav className="Navigation navbar navbar-expand-md fixed-top"> {/* Add fixed-top class */}
+      <div className="container-fluid"> {/* Use Bootstrap container */}
+        <Link className="navbar-brand" to="/">Home</Link>
+        <div className="navbar-nav ml-md-auto"> {/* Use ml-md-auto for medium and larger screens */}
+          {user ? (
+            <>
+              <NavLink className="nav-item nav-link" to="/composers">Composers</NavLink>
+              <NavLink className="nav-item nav-link" to="/compositions">Compositions</NavLink>
+              <NavLink className="nav-item nav-link" to="/profile">Profile</NavLink>
+              <a className="nav-item nav-link" href="/" onClick={handleLogout}>Log out {user.username}</a>
+            </>
+          ) : (
+            <>
+              <NavLink className="nav-item nav-link" to="/signup">Sign Up</NavLink>
+              <NavLink className="nav-item nav-link" to="/login">Login</NavLink>
+            </>
+          )}
+        </div>
+      </div>
     </nav>
   );
 }

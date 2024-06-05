@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
+import '../App.css';
 
 function CompositionList() {
   const [compositions, setCompositions] = useState([]);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
 
   useEffect(() => {
     const fetchCompositions = async () => {
       try {
-        console.log("Making API Call");
         const data = await ModernMaestroApi.getCompositions();
-        console.log("API Response:", data);
         setCompositions(data);
-        setError(null); // Clear any previous errors
+        setError(null);
       } catch (error) {
         console.error("Error fetching compositions:", error);
         setCompositions([]);
@@ -25,42 +23,50 @@ function CompositionList() {
     fetchCompositions();
   }, []);
 
-  // Function to filter compositions based on search term
-  const filteredCompositions = compositions.filter(composition =>
-    composition.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCompositions = compositions
+    .filter(composition => 
+      composition.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => a.title.localeCompare(b.title));
 
   if (error) {
     return <div>Error: {error}</div>;
   }
 
   return (
-    <div>
-      <h2>Compositions</h2>
-      <div><Link to="/select-composer">Add New Composition</Link> </div>
-      <input
-        type="text"
-        placeholder="Search compositions..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+    <div className="main-content">
+      <div className="main-header">
+        <h1 className="swoopIn">Compositions</h1>
+      </div>
+      <div>
+        <Link to="/select-composer">Add New Composition</Link>
+        <input
+          type="text"
+          className="search-bar"
+          placeholder="Search compositions..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       {filteredCompositions.length === 0 ? (
-        <p>No compositions found. </p>
+        <div className="list-box">
+          <p>No compositions found. Please click below to first find the composer.</p>
+          <Link to="/composers" className="link-button">Search for Composers</Link>
+        </div>
       ) : (
-        <ul>
-          {/* Map over filtered compositions */}
-          {filteredCompositions.map((composition) => (
-            <li key={composition.composition_id}>
-              <Link to={`/compositions/${composition.composition_id}`}>
-                {composition.title} by {composition.Composer.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="list-box">
+          <ul>
+            {filteredCompositions.map(composition => (
+              <li key={composition.composition_id}>
+                <Link to={`/compositions/${composition.composition_id}`}>
+                  {composition.title} by {composition.Composer.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
-      
     </div>
-    
   );
 }
 

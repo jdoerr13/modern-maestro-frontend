@@ -1,13 +1,16 @@
 import React from 'react';
 import { BrowserRouter } from "react-router-dom";
 import { UserProvider } from './auth/UserContext'; 
-import Navigation from "./routes-nav/Navigation"; // Correct the paths as necessary
-import CustomRoutes from "./routes-nav/Routes"; // Correct the paths as necessary
+import Navigation from "./routes-nav/Navigation"; 
+import CustomRoutes from "./routes-nav/Routes"; 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css'; // Assuming the CSS file is in the src folder
+
 
 function App() {
   return (
     <BrowserRouter>
-      <UserProvider> {/* This ensures all child components have access to the context */}
+      <UserProvider> 
         <div className="App">
           <Navigation />
           <CustomRoutes />

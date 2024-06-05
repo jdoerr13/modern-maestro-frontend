@@ -344,6 +344,7 @@ static async fetchTracksByComposerName(composerName) {
       throw error;
     }
   }
+  
   static async updateComposerForUser(userId, data) {
     console.log("updateComposerForUser received data:", data);
     // Prepare the data to be sent
