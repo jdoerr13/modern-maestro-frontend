@@ -13,12 +13,16 @@ function Navigation() {
   };
 
   return (
-    <nav className="Navigation navbar navbar-expand-md fixed-top"> {/* Add fixed-top class */}
-      <div className="container-fluid"> {/* Use Bootstrap container */}
+    <nav className="Navigation navbar navbar-expand-md fixed-top">
+      <div className="container-fluid">
         <Link className="navbar-brand" to="/">Home</Link>
-        <div className="navbar-nav ml-md-auto"> {/* Use ml-md-auto for medium and larger screens */}
+     
+        <div className="navbar-nav ml-md-auto">
           {user ? (
             <>
+               <div className="navbar-text animated-text">
+                Help us grow our database, click here <span className="arrow">→</span>
+              </div>
               <NavLink className="nav-item nav-link" to="/composers">Composers</NavLink>
               <NavLink className="nav-item nav-link" to="/compositions">Compositions</NavLink>
               <NavLink className="nav-item nav-link" to="/profile">Profile</NavLink>

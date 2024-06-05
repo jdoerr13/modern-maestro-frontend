@@ -13,6 +13,7 @@ function ComposerList() {
   useEffect(() => {
     const fetchComposers = async () => {
       const composers = await ModernMaestroApi.getComposers();
+      composers.sort((a, b) => a.name.localeCompare(b.name)); // Sort composers alphabetically by name
       setComposers(composers);
     };
     fetchComposers();

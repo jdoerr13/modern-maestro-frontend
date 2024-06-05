@@ -3,19 +3,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
+    /* min-height: 19vh; */
     background-color: transparent; /* Transparent background */
-    padding: 20px;
+    padding: 0px;
+    /* background-image: url('/images/pinkGrades.jpg'); */
   }
   
   .form-container {
+    margin-top: 130px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;

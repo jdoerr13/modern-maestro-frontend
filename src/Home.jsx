@@ -18,6 +18,7 @@ function WaveText({ text }) {
 // Prepare audio
 const audio = new Audio('/sounds/orchestra-tuning.wav');
 
+
 function Home() {
   const { user } = useContext(UserContext);
   const [greeting, setGreeting] = useState("");
@@ -65,11 +66,11 @@ function Home() {
           <button onClick={toggleSound} style={{ marginTop: "20px" }}>
             {isPlaying ? "Stop Sound" : "Start your experience"}
           </button>
-          <div class="music-notes-container">
-    <div class="music-note">&#9835;</div>
-    <div class="music-note">&#9833;</div>
-    <div class="music-note">&#9834;</div>
-  </div>
+            <div class="music-notes-container">
+              <div class="music-note">&#9835;</div>
+              <div class="music-note">&#9833;</div>
+              <div class="music-note">&#9834;</div>
+            </div>
         </>
       ) : (
         <>
@@ -80,7 +81,7 @@ function Home() {
         <br></br>
         {/* Render buttons only if showForm is not set */}
         {!showForm && (
-          <div className="buttons-container">
+          <div>
             <button onClick={() => setShowForm('login')} className="link-button">Log in</button>
             <button onClick={() => setShowForm('signup')} className="link-button">Sign up</button>
           </div>
