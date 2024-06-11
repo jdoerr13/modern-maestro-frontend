@@ -55,21 +55,21 @@ function Home() {
           >
             {greeting}
           </motion.h2>
-          <motion.p
+          <motion.div
             initial={{ x: -100, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 1.5 }}
             className="description"
           >
           <WaveText text="Explore&nbsp;the&nbsp;new&nbsp;world&nbsp;of&nbsp;classical&nbsp;music" />
-          </motion.p>
+          </motion.div>
           <button onClick={toggleSound} style={{ marginTop: "20px" }}>
             {isPlaying ? "Stop Sound" : "Start your experience"}
           </button>
-            <div class="music-notes-container">
-              <div class="music-note">&#9835;</div>
-              <div class="music-note">&#9833;</div>
-              <div class="music-note">&#9834;</div>
+            <div className="music-notes-container">
+              <div className="music-note">&#9835;</div>
+              <div className="music-note">&#9833;</div>
+              <div className="music-note">&#9834;</div>
             </div>
         </>
       ) : (

@@ -233,14 +233,14 @@ const renderSelectedInstruments = () => (
 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="main-content" onSubmit={handleSubmit}>
         {composerName && (
         <div>
-          <h2>Adding composition for {composerName}</h2>
+          <h2>Add New Composition for {composerName}</h2>
         </div>
       )}
       <div>
-        <label htmlFor="title">Title</label>
+        <label htmlFor="title">Title: &nbsp;</label>
         <input
           id="title"
           name="title"
@@ -250,7 +250,7 @@ const renderSelectedInstruments = () => (
         />
       </div>
       <div>
-        <label htmlFor="year">Year Composed</label>
+        <label htmlFor="year">Year Composed:&nbsp; </label>
         <select
         id="year_of_composition"
         name="year_of_composition"
@@ -265,7 +265,7 @@ const renderSelectedInstruments = () => (
 </select>
       </div>
       <div>
-        <label htmlFor="description">Description</label>
+        <label htmlFor="description">Description:&nbsp;</label>
         <textarea
           id="description"
           name="description"
@@ -274,7 +274,7 @@ const renderSelectedInstruments = () => (
         />
       </div>
       <div>
-        <label htmlFor="duration">Duration</label>
+        <label htmlFor="duration">Duration: &nbsp;</label>
         <input
           id="duration"
           name="duration"
@@ -286,7 +286,7 @@ const renderSelectedInstruments = () => (
         />
       </div>
       <div>
-        <label htmlFor="instrumentation">Instrumentation</label>
+        <label htmlFor="instrumentation">Instrumentation: &nbsp;</label>
         <select
           id="instrumentation"
           name="instrumentation"
@@ -302,7 +302,7 @@ const renderSelectedInstruments = () => (
         </select>
       </div>
       <div>
-        <label>Selected Instruments</label>
+        <label>Selected Instruments: &nbsp;</label>
         {renderSelectedInstruments()}
         <ul>
           {selectedInstruments.map((instrument, index) => (
@@ -311,14 +311,13 @@ const renderSelectedInstruments = () => (
         </ul>
       </div>
       <div>
-    <label htmlFor="audioFile" className="file-upload-label">Choose File</label>
+    <label htmlFor="audioFile" className="file-upload-label">Choose File: &nbsp;</label>
   <input
     type="file"
     id="audioFile"
     name="audioFile"
     onChange={handleFileChange}
     accept="audio/*"
-    // style={{ display: 'none' }} // Keep the input hidden
   />
 
 
@@ -331,8 +330,9 @@ const renderSelectedInstruments = () => (
   </div>
   )}
       </div>
-      <button type="submit">{isEditing ? 'Update Composition' : 'Add Composition'}</button>
-      <button type="button" onClick={handleCancel}>Cancel</button>
+      <button className="button"  type="submit">{isEditing ? 'Update Composition' : 'Add Composition'}</button>
+      &nbsp;
+      <button className="button"  type="button" onClick={handleCancel}>Cancel</button>
       {errors.submit && <div>{errors.submit}</div>}
     </form>
   );

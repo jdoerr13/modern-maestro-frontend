@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
@@ -40,6 +41,8 @@ function CompositionList() {
       </div>
       <div>
         <Link to="/select-composer">Add New Composition</Link>
+        
+        
         <input
           type="text"
           className="search-bar"

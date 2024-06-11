@@ -11,7 +11,6 @@ function ComposerTrackSearch() {
   const [composerId, setComposerId] = useState(null);
   const navigate = useNavigate();
 
-
   const handleSearch = async () => {
     try {
       const fetchedTracks = await ModernMaestroApi.fetchTracksByComposerName(searchTerm);
@@ -28,7 +27,7 @@ function ComposerTrackSearch() {
     } catch (error) {
       console.error('Error fetching tracks:', error);
       setErrorMessage('An error occurred while fetching tracks. Please try again.');
-      setComposerFound(false); //  composerFound is reset in case of error
+      setComposerFound(false); // composerFound is reset in case of error
     }
   };
 
@@ -44,8 +43,8 @@ function ComposerTrackSearch() {
       const newComposer = await ModernMaestroApi.createComposer(composerData);
       console.log('New Composer Added:', newComposer);
       
-       // Update the composerId state with the ID of the newly added composer
-       setComposerId(newComposer.composer_id);
+      // Update the composerId state with the ID of the newly added composer
+      setComposerId(newComposer.composer_id);
 
       setComposerAdded(true);
       setComposerFound(false); // Optionally hide the button after adding the composer
@@ -59,14 +58,15 @@ function ComposerTrackSearch() {
     const minutes = Math.floor(durationMs / 60000);
     const seconds = ((durationMs % 60000) / 1000).toFixed(0);
     return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-}
-function standardizeDuration(duration) {
+  }
+
+  function standardizeDuration(duration) {
     // Check if duration is already in 'MM:SS' format and return if it is
     if (/^\d{1,2}:\d{2}$/.test(duration)) {
       return duration.length === 4 ? `0${duration}` : duration;
     }
   
-    //  duration is in seconds if not in 'MM:SS' format
+    // duration is in seconds if not in 'MM:SS' format
     let totalSeconds = parseInt(duration, 10); // Safely convert to integer
     if (isNaN(totalSeconds)) {
       return "00:00"; // Return a fallback value or handle error as appropriate
@@ -77,6 +77,7 @@ function standardizeDuration(duration) {
     
     return `${minutes}:${seconds}`;
   }
+
   const handleAddAllTracksToDatabase = async () => {
     if (!tracks.length || !composerId) {
       console.log("No tracks to add or composer ID missing.");
@@ -111,42 +112,44 @@ function standardizeDuration(duration) {
         }
     }
     navigate(`/composers/${composerId}`);
-};
+  };
 
-return (
-  <div className="main-content"> {/* Use the main-content class here as well */}
-    <p><strong>Search for a Composer's Music on Spotify Here</strong></p>
-    <input
-      type="text"
-      placeholder="Confirm Composer Here..."
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-    <button onClick={handleSearch}>Search</button>
-    {errorMessage && <p>{errorMessage}</p>}
-    {composerFound && !composerAdded && (
-      <button onClick={handleAddComposerToDatabase}>Add Composer to Database</button>
-    )}
-    {composerAdded && (
-      <>
-        <h2>Compositions from {searchTerm}</h2>
-        <button onClick={handleAddAllTracksToDatabase}>Add All Tracks to Database</button>
-      </>
-    )}
-    {Array.isArray(tracks) && tracks.map((track, index) => (
-      <div key={index}>
-        <p><strong>Title:</strong> {track.name}</p>
-        <p><strong>Duration:</strong> {standardizeDuration(track.duration)}</p> {/* Ensure the correct format is displayed */}
-        <p><strong>Year:</strong> {track.year}</p>
-        <p><strong>Album:</strong> {track.album}</p>
-        {track.preview_url && (
-          <p><strong>Listen Here:</strong> <a href={track.preview_url} target="_blank" rel="noopener noreferrer">Preview</a></p>
-        )}
-      </div>
-    ))}
-  </div>
-);
+  return (
+    <div className="main-content"> 
+      <h2>Search for a Composer's Music on Spotify Here</h2>
+      <input
+        type="text"
+        placeholder="Confirm Composer Here..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      {!composerFound && <button className="button" onClick={handleSearch}>Search</button>}
+      {errorMessage && <p>{errorMessage}</p>}
+      {composerFound && !composerAdded && (
+        <div>
+          <h3> Success! Composer {searchTerm} found </h3>
+          <button className="button" onClick={handleAddComposerToDatabase}>Please Add Composer to Database</button>
+        </div>
+      )}
+      {composerAdded && (
+        <div className="compositions-section">
+          <h2>Compositions from {searchTerm}</h2>
+          <button className="button" onClick={handleAddAllTracksToDatabase}>Add All Tracks to Database</button>
+          {Array.isArray(tracks) && tracks.map((track, index) => (
+            <div key={index}>
+              <p><strong>Title:</strong> {track.name}</p>
+              <p><strong>Duration:</strong> {standardizeDuration(track.duration)}</p> 
+              <p><strong>Year:</strong> {track.year}</p>
+              <p><strong>Album:</strong> {track.album}</p>
+              {track.preview_url && (
+                <p><strong>Listen Here:</strong> <a href={track.preview_url} target="_blank" rel="noopener noreferrer">Preview</a></p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
-
 
 export default ComposerTrackSearch;

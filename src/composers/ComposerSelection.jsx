@@ -40,8 +40,8 @@ function ComposerSelection() {
     
 
     return (
-      <div>
-        <h2>Select a Composer to Add a New Composition</h2>
+      <div className="main-content">
+        <h2 className="swoopIn">Select a Composer to Add a New Composition</h2>
         <input
           type="text"
           placeholder="Search composers..."
@@ -61,7 +61,7 @@ function ComposerSelection() {
           ))}
           </ul>
         )}
-        <button onClick={() => navigate('/composers/new')}>Add New Composer</button>
+        <button className="button" onClick={() => navigate('/composers/new')}>Add New Composer</button>
       </div>
     );
 }

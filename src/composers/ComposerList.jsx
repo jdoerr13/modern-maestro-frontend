@@ -13,7 +13,7 @@ function ComposerList() {
   useEffect(() => {
     const fetchComposers = async () => {
       const composers = await ModernMaestroApi.getComposers();
-      composers.sort((a, b) => a.name.localeCompare(b.name)); // Sort composers alphabetically by name
+      composers.sort((a, b) => a.name.localeCompare(b.name)); 
       setComposers(composers);
     };
     fetchComposers();
@@ -35,22 +35,24 @@ function ComposerList() {
       <div>
         <Link to="/composers/new">Add New Composer</Link>
       </div>
+      <button className="button right-button" onClick={() => setShowTrackSearch(true)}>Or Directly Search the Api</button>
       <input
         type="text"
         className="search-bar"
-        placeholder="Search composers..."
+        placeholder="Search composer list..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      {filteredComposers.length === 0 ? (
+      {filteredComposers.length === 0 && !showTrackSearch && (
         <div className="list-box">
           <p>No composers found. Please click below to search online.</p>
           {showAddComposer && !showTrackSearch && (
-            <button onClick={() => setShowTrackSearch(true)}>Help us add more composers</button>
+            <button className="button" onClick={() => setShowTrackSearch(true)}>Help us add more 'classical' composers</button>
           )}
-          {showTrackSearch && <ComposerTrackSearch />}
         </div>
-      ) : (
+      )}
+      {showTrackSearch && <ComposerTrackSearch />}
+      {filteredComposers.length > 0 && (
         <div className="list-box">
           <ul>
             {filteredComposers.map(composer => (
@@ -61,7 +63,9 @@ function ComposerList() {
           </ul>
         </div>
       )}
+    
     </div>
+    
   );
 }
 

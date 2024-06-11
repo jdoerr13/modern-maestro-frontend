@@ -1,11 +1,10 @@
 import React, { useContext } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import UserContext from '../auth/UserContext'; // Ensure this path is correct
+import UserContext from '../auth/UserContext'; 
 
 function Navigation() {
   const { user, logout } = useContext(UserContext); 
-  const navigate = useNavigate(); // Initialize useNavigate
-
+  const navigate = useNavigate(); 
   const handleLogout = (e) => {
     e.preventDefault();
     logout(); 

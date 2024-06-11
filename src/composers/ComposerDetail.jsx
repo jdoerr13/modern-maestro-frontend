@@ -89,9 +89,11 @@ function ComposerDetail() {
                   </li>
                 ))}
               </ul>
-              <button onClick={handleAddCompositionClick}>Add Composition</button>
-              <button type="button" onClick={() => setIsEditing(true)}>Edit Composer Details</button>
-              <NavLink to="/profile" className="nav-link">Back to Profile</NavLink>
+              <button className="button" onClick={handleAddCompositionClick}>Add Composition</button>
+              <button className="button" type="button" onClick={() => setIsEditing(true)}>Edit Composer Details</button>
+              <div>
+              < NavLink to="/composers" className="nav-link">Back to Composer List</NavLink>
+              </div>
             </div>
           )}
         </div>

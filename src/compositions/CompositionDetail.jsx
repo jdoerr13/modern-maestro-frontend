@@ -70,8 +70,9 @@ function CompositionDetail() {
         <h2 className="swoopIn">{composition.title}</h2>
       </div>
       <div className="centered-content">
-        <div className="info-block">
-          <h5>Composed by: {composition.composer}</h5>
+       
+          <h4>Composed by: {composition.composer}</h4>
+          <div className="info-block">
           <h5>Year of Composition: {composition.year_of_composition}</h5>
           <h5>Duration: {formatDuration(composition.duration)}</h5>
           <h5>Instrumentation: {Array.isArray(composition.instrumentation) ? composition.instrumentation.join(', ') : ''}</h5>
