@@ -1,4 +1,4 @@
-                                                                        Modern Maestro
+                            Modern Maestro
 
 Modern Maestro is a web application that allows users to explore, manage, and contribute to a comprehensive database of classical music compositions and composers. Users can search for composers, view their compositions, add new compositions, and interact with an API to fetch music data.
 
@@ -51,22 +51,22 @@ Usage:
   
 
 Features
-    User Authentication
+   - User Authentication
         User login and signup.
         Secure authentication using JWT tokens.
-    Composers
+    - Composers
         View a list of composers.
         Search for composers by name.
         Add new composers.
         View detailed composer information.
         Edit composer details.
-    Compositions
+    - Compositions
         View a list of compositions.
         Search for compositions by title.
         Add new compositions.
         View detailed composition information.
         Edit composition details.
-    Additional Features
+    - Additional Features
         Search for tracks by composer name on Spotify.
         Add tracks to the database.
         Fetch a list of instruments.

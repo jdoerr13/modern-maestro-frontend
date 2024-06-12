@@ -12,8 +12,8 @@ import CompositionList from "../compositions/CompositionList";
 import CompositionDetail from "../compositions/CompositionDetail";
 import CompositionForm from "../compositions/CompositionForm";
 import ComposerSelection from "../composers/ComposerSelection";
-import UserInteractionsList from "../userInteractions/UserInteractionsList";
-import UserInteractionForm from "../userInteractions/UserInteractionForm";
+// import UserInteractionsList from "../userInteractions/UserInteractionsList";
+// import UserInteractionForm from "../userInteractions/UserInteractionForm";
 
 
 import { useUserContext } from '../auth/UserContext'; 
@@ -38,9 +38,9 @@ function CustomRoutes() {
       <Route path="/profile" element={<UserProfile />} />
       <Route path="/profile/edit" element={<UpdateProfileForm />} />
       <Route path="/select-composer" element={<ComposerSelection />} />
-      <Route path="/user-interactions" element={<UserInteractionsList />} /> 
+      {/* <Route path="/user-interactions" element={<UserInteractionsList />} /> 
        <Route path="/user-interactions/new" element={<UserInteractionForm />} />
-      <Route path="/user-interactions/:interactionId/edit" element={<UserInteractionForm />} />
+      <Route path="/user-interactions/:interactionId/edit" element={<UserInteractionForm />} /> */}
     </Routes>
   );
 }

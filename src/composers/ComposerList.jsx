@@ -39,7 +39,7 @@ function ComposerList() {
       <input
         type="text"
         className="search-bar"
-        placeholder="Search composer list..."
+        placeholder="Search our composer list..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />

@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ModernMaestroApi from '../api/api';
 
-
 const CompositionForm = ({ onCancel }) => {
   const { state } = useLocation();
-  const { compositionId } = useParams()
+  const { compositionId } = useParams();
   const { composerId, composerName, isEditing } = state || {};
   const [audioFile, setAudioFile] = useState(null);
   const navigate = useNavigate();
@@ -62,7 +61,6 @@ const CompositionForm = ({ onCancel }) => {
     fetchCompositionDetails();
   }, [compositionId, navigate]);
 
-
   useEffect(() => {
     const fetchInstrumentList = async () => {
       try {
@@ -91,7 +89,6 @@ const CompositionForm = ({ onCancel }) => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     // Handle the input for 'year_of_composition', converting it to an integer
@@ -116,24 +113,23 @@ const CompositionForm = ({ onCancel }) => {
     }
   };
 
-    const handleInstrumentDoubleClick = (instrument) => {
-      // check if the instrument is already in the selectedInstruments array....If not, add it to the array to prevent duplicates.
-      if (!selectedInstruments.includes(instrument)) {
-          const updatedSelectedInstruments = [...selectedInstruments, instrument];
-          setSelectedInstruments(updatedSelectedInstruments);
-          
-          // For formData.instrumentation, ensure it also doesn't contain duplicates.
-          // Since it's possible formData.instrumentation and selectedInstruments
-          // could get out of sync, it's safe to derive the updated state from
-          // updatedSelectedInstruments directly.
-          setFormData(formData => ({
-              ...formData,
-              instrumentation: updatedSelectedInstruments
-          }));
-      }
+  const handleInstrumentDoubleClick = (instrument) => {
+    // check if the instrument is already in the selectedInstruments array....If not, add it to the array to prevent duplicates.
+    if (!selectedInstruments.includes(instrument)) {
+        const updatedSelectedInstruments = [...selectedInstruments, instrument];
+        setSelectedInstruments(updatedSelectedInstruments);
+        
+        // For formData.instrumentation, ensure it also doesn't contain duplicates.
+        // Since it's possible formData.instrumentation and selectedInstruments
+        // could get out of sync, it's safe to derive the updated state from
+        // updatedSelectedInstruments directly.
+        setFormData(formData => ({
+            ...formData,
+            instrumentation: updatedSelectedInstruments
+        }));
+    }
   };
   
-
   const handleInstrumentChange = (selectedOptions) => {
     // Map over selectedOptions to create an array of selected instrument names
     const selectedInstruments = Array.from(selectedOptions).map(option => option.value);
@@ -148,27 +144,25 @@ const CompositionForm = ({ onCancel }) => {
     }));
   };
 
-
   // Function to remove a selected instrument
-const handleRemoveInstrument = (instrumentToRemove) => {
-  // Filter out the instrument to remove
-  const updatedSelectedInstruments = selectedInstruments.filter(instrument => instrument !== instrumentToRemove);
-  setSelectedInstruments(updatedSelectedInstruments);
-  // Update formData to reflect the change
-  setFormData({ ...formData, instrumentation: updatedSelectedInstruments });
-};
+  const handleRemoveInstrument = (instrumentToRemove) => {
+    // Filter out the instrument to remove
+    const updatedSelectedInstruments = selectedInstruments.filter(instrument => instrument !== instrumentToRemove);
+    setSelectedInstruments(updatedSelectedInstruments);
+    // Update formData to reflect the change
+    setFormData({ ...formData, instrumentation: updatedSelectedInstruments });
+  };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    // Check if duration field has been modified
+    const durationToSubmit = formData.duration.trim() === '' ? originalDuration : formData.duration;
+    const cleanInstrumentation = formData.instrumentation.filter(instr => instr && instr !== "Not specified");
+    const totalSeconds = calculateTotalSeconds(durationToSubmit);
+    // Format the duration string in the required format ("00:00" or "0:00")
+    const formattedDuration = formatDuration(totalSeconds);
 
-const handleSubmit = async (event) => {
-  event.preventDefault();
-  // Check if duration field has been modified
-  const durationToSubmit = formData.duration.trim() === '' ? originalDuration : formData.duration;
-  const cleanInstrumentation = formData.instrumentation.filter(instr => instr && instr !== "Not specified");
-  const totalSeconds = calculateTotalSeconds(durationToSubmit);
-  // Format the duration string in the required format ("00:00" or "0:00")
-  const formattedDuration = formatDuration(totalSeconds);
-
-  const submissionFormData = new FormData();
+    const submissionFormData = new FormData();
     submissionFormData.append("title", formData.title);
     submissionFormData.append("year", formData.year_of_composition.toString());
     submissionFormData.append("description", formData.description);
@@ -206,17 +200,17 @@ const handleSubmit = async (event) => {
     }
   };
 
-// Update the render of selected instruments to include a remove option
-const renderSelectedInstruments = () => (
-  <ul>
-    {selectedInstruments.map((instrument, index) => (
-      <li key={index}>
-        {instrument}
-        <button type="button" onClick={() => handleRemoveInstrument(instrument)}>Remove</button>
-      </li>
-    ))}
-  </ul>
-);
+  // Update the render of selected instruments to include a remove option
+  const renderSelectedInstruments = () => (
+    <ul>
+      {selectedInstruments.map((instrument, index) => (
+        <li key={index}>
+          {instrument}
+          <button type="button" onClick={() => handleRemoveInstrument(instrument)}>Remove</button>
+        </li>
+      ))}
+    </ul>
+  );
 
   const handleCancel = () => {
     navigate(-1);
@@ -227,14 +221,13 @@ const renderSelectedInstruments = () => (
     // If needed, add API call here to remove the file from the backend
   };
 
-    const currentYear = new Date().getFullYear();
-    const earliestYear = 1900; // Adjust based on your requirements
-    const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
-
+  const currentYear = new Date().getFullYear();
+  const earliestYear = 1900; // Adjust based on your requirements
+  const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
 
   return (
     <form className="main-content" onSubmit={handleSubmit}>
-        {composerName && (
+      {composerName && (
         <div>
           <h2>Add New Composition for {composerName}</h2>
         </div>
@@ -250,19 +243,19 @@ const renderSelectedInstruments = () => (
         />
       </div>
       <div>
-        <label htmlFor="year">Year Composed:&nbsp; </label>
+        <label htmlFor="year_of_composition">Year Composed:&nbsp; </label>
         <select
-        id="year_of_composition"
-        name="year_of_composition"
-        value={formData.year_of_composition}
-        onChange={handleChange}
-        required
-      >
-  <option value="">Select a Year</option>
-  {years.map(year => (
-    <option key={year} value={year}>{year}</option>
-  ))}
-</select>
+          id="year_of_composition"
+          name="year_of_composition"
+          value={formData.year_of_composition}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select a Year</option>
+          {years.map(year => (
+            <option key={year} value={year}>{year}</option>
+          ))}
+        </select>
       </div>
       <div>
         <label htmlFor="description">Description:&nbsp;</label>
@@ -293,7 +286,6 @@ const renderSelectedInstruments = () => (
           multiple
           value={formData.instrumentation} // Ensure formData.instrumentation is an array
           onChange={(e) => handleInstrumentChange(e.target.selectedOptions)}
-          // required
           onDoubleClick={(e) => handleInstrumentDoubleClick(e.target.value)}
         >
           {instrumentList.map(instrument => (
@@ -311,28 +303,26 @@ const renderSelectedInstruments = () => (
         </ul>
       </div>
       <div>
-    <label htmlFor="audioFile" className="file-upload-label">Choose File: &nbsp;</label>
-  <input
-    type="file"
-    id="audioFile"
-    name="audioFile"
-    onChange={handleFileChange}
-    accept="audio/*"
-  />
-
-
-  {isEditing && audioFile && (
-    <div>
-    <audio controls src={audioFile}>
-      Your browser does not support the audio element.
-    </audio>
-    <button onClick={handleDeleteAudioFile}>Delete Audio File</button> {/* Delete button */}
-  </div>
-  )}
+        <label htmlFor="audioFile" className="file-upload-label">Choose File: &nbsp;</label>
+        <input
+          type="file"
+          id="audioFile"
+          name="audioFile"
+          onChange={handleFileChange}
+          accept="audio/*"
+        />
+        {isEditing && audioFile && (
+          <div>
+            <audio controls src={audioFile}>
+              Your browser does not support the audio element.
+            </audio>
+            <button onClick={handleDeleteAudioFile}>Delete Audio File</button> {/* Delete button */}
+          </div>
+        )}
       </div>
-      <button className="button"  type="submit">{isEditing ? 'Update Composition' : 'Add Composition'}</button>
+      <button className="button" type="submit">{isEditing ? 'Update Composition' : 'Add Composition'}</button>
       &nbsp;
-      <button className="button"  type="button" onClick={handleCancel}>Cancel</button>
+      <button className="button" type="button" onClick={handleCancel}>Cancel</button>
       {errors.submit && <div>{errors.submit}</div>}
     </form>
   );
