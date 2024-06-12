@@ -54,7 +54,6 @@ describe('CompositionForm', () => {
       </BrowserRouter>
     );
 
-    // Check if it handles missing composer details gracefully
     expect(screen.queryByText(/add new composition for/i)).toBeNull();
   });
 });

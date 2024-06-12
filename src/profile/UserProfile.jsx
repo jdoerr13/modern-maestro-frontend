@@ -66,9 +66,9 @@ function UserProfile() {
                 setComposerId(null);
                 setComposerForm({
                   name: '', // Reset composer name
-                  biography: '', // Reset biography
-                  website: '', // Reset website
-                  socialMediaLinks: [{ platform: '', link: '' }], // Reset social media links
+                  biography: '', 
+                  website: '', 
+                  socialMediaLinks: [{ platform: '', link: '' }], 
                 });
                 setCompositions([]); // Reset compositions
               }
@@ -85,13 +85,11 @@ function UserProfile() {
     if (contextUser) {
       fetchUserProfileAndData();
     } else {
-      // Here you might want to handle the scenario where contextUser is null
-      // For example, redirect to a login page, or show a loading spinner, etc.
       console.log('No user context available.');
     }
   }, [contextUser]);
   
-  // Add a guard clause to prevent rendering the component if contextUser is null
+  // guard clause to prevent rendering the component if contextUser is null
   if (!contextUser) {
     return <div>Loading user profile...</div>;
   }
@@ -99,7 +97,6 @@ function UserProfile() {
   const handleEditComposer = () => {
     setIsEditingComposer(true); // Toggle editing state to show the edit form
   };
-  // Implement updateUserProfile function
   const updateUserProfile = async (updateData) => {
     if (!contextUser || !contextUser.user_id) {
       console.error("No user context or user ID available for updating profile.");
@@ -109,7 +106,6 @@ function UserProfile() {
       // Assuming updateUser in your API accepts the user ID and the data to be updated
       const updatedUser = await ModernMaestroApi.updateUser(contextUser.username, updateData);
       console.log("Profile updated successfully:", updatedUser);
-      // Optionally, update the user context or state here if needed
     } catch (error) {
       console.error("Failed to update user profile:", error);
     }
@@ -134,7 +130,7 @@ const handleComposerStatusChange = async (e) => {
         // Update composerForm with the user's username when user data is successfully fetched
         setComposerForm(prevForm => ({
           ...prevForm,
-          name: user.username  // This updates the composer name to the user's username
+          name: user.username  //  updates the composer name to the user's username
         }));
       }
     } catch (error) {
@@ -144,7 +140,7 @@ const handleComposerStatusChange = async (e) => {
     // If the user is not a composer, reset the composer name
     setComposerForm(prevForm => ({
       ...prevForm,
-      name: '' // Reset composer name
+      name: '' 
     }));
   }
 
@@ -238,6 +234,5 @@ const handleComposerStatusChange = async (e) => {
   );
   
 }
-
 
 export default UserProfile;

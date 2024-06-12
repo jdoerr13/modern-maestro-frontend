@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import CompositionDetail from './CompositionDetail';
 import ModernMaestroApi from '../api/api';
-import { UserProvider } from '../auth/UserContext'; // Import the UserProvider
+import { UserProvider } from '../auth/UserContext'; 
 
 jest.mock('../api/api', () => ({
   getCompositionById: jest.fn(),

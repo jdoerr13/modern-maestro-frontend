@@ -88,7 +88,7 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
         biography: formData.biography,
         website: formData.website,
         social_media_links: socialMediaLinksObject,
-        user_id: user_id // Ensure you are passing user_id correctly
+        user_id: user_id 
       };
   
       if (composerId) {
@@ -100,15 +100,15 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
          setShowSuccessMessage(true);
          setTimeout(() => {
           setShowSuccessMessage(false);
-        }, 3000); // 3000 milliseconds (3 seconds) in this example
-        navigate(`/composers`); // Redirect after successful update
+        }, 3000); 
+        navigate(`/composers`); 
 
       } else {
         // Create a new composer profile
         console.log("Creating a new composer with data:", submitData);
         const response = await ModernMaestroApi.createComposer(apiUrl, submitData);
         console.log("New composer created successfully:", response);
-        navigate(`/composers`); // Redirect after successful creation
+        navigate(`/composers`); 
       }
 
             // Show success message
@@ -129,7 +129,6 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h3>Composer Info:</h3>
-      {/* Form fields */}
       <div>
         <label htmlFor="name">Full Name</label>
         <input id="name" name="name" value={formData.name} onChange={handleChange} required />
@@ -163,7 +162,6 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
         <button type="button" onClick={handleAddLink}>Add Link</button>
       </div>
       <button type="submit">Save</button>
-      {/* Success message */}
       {showSuccessMessage && (
         <div className="alert alert-success" role="alert">
           Composer updated successfully!

@@ -67,7 +67,7 @@ function ComposerTrackSearch() {
     }
   
     // duration is in seconds if not in 'MM:SS' format
-    let totalSeconds = parseInt(duration, 10); // Safely convert to integer
+    let totalSeconds = parseInt(duration, 10); // convert to integer
     if (isNaN(totalSeconds)) {
       return "00:00"; // Return a fallback value or handle error as appropriate
     }
@@ -87,7 +87,7 @@ function ComposerTrackSearch() {
         const compositionData = new FormData();
         compositionData.append("title", track.name);
         compositionData.append("composerId", composerId.toString());
-        compositionData.append("duration", standardizeDuration(track.duration)); // Ensure this conversion is correct
+        compositionData.append("duration", standardizeDuration(track.duration)); 
         compositionData.append("year", track.year.toString());
         compositionData.append("description", track.description);
 
@@ -107,7 +107,6 @@ function ComposerTrackSearch() {
           console.error('API Error:', error.response ? error.response.data : error);
             if (error.response) {
                 console.error('Detailed error:', error.response.data);
-                // Optionally continue with next tracks or handle error specific actions
             }
         }
     }

@@ -27,7 +27,7 @@ function CompositionDetail() {
         setComposition({ ...fetchedComposition, composer: composer.name, audioUrl });
       } catch (error) {
         console.error("Failed to fetch composition details:", error);
-        navigate('/compositions'); // Navigate to compositions list on error
+        navigate('/compositions'); 
       }
     };
 

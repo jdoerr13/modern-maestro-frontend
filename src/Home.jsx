@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { motion } from 'framer-motion';
 import UserContext from "./auth/UserContext";
-import LoginForm from './auth/LoginForm'; // Adjust the import path if necessary
-import SignupForm from './auth/SignupForm'; // Adjust the import path if necessary
+import LoginForm from './auth/LoginForm'; 
+import SignupForm from './auth/SignupForm'; 
 
 function WaveText({ text }) {
   return (

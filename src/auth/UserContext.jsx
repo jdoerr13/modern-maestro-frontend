@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import ModernMaestroApi from '../api/api'; // Adjust the path as necessary
+import ModernMaestroApi from '../api/api'; 
 
 const UserContext = createContext();
 
-// Define a constant for your token storage key
+// constant for your token storage key
 const TOKEN_STORAGE_ID = 'modernmaestro-token';
 
 export const UserProvider = ({ children }) => {
@@ -52,7 +52,6 @@ export const UserProvider = ({ children }) => {
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
         user_id: userDetails.user_id,
-        // Avoid storing sensitive information like passwords
       });
 
       // Store user details in localStorage for persistence
@@ -62,7 +61,6 @@ export const UserProvider = ({ children }) => {
         firstName: userDetails.firstName,
         lastName: userDetails.lastName,
         user_id: userDetails.user_id,
-        // Exclude password or sensitive info
       }));
     } catch (error) {
       console.error("Error fetching user details:", error);

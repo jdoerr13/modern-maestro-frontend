@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserContext from './UserContext'; // Adjust the import path
+import UserContext from './UserContext'; 
 import Modal from 'react-modal';
 import './LoginSignForm.css';
 
-Modal.setAppElement('#root'); // Ensure modal can properly handle accessibility
+Modal.setAppElement('#root'); 
 
 function LoginForm() {
   const { login } = useContext(UserContext);
@@ -14,7 +14,7 @@ function LoginForm() {
     password: '',
   });
   const [error, setError] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,8 +36,8 @@ function LoginForm() {
       await login(formData);
       navigate('/');
     } catch (err) {
-      console.error('Login error:', err); // Log the error for debugging
-      console.log('Error response:', err.response); // Log the error response to inspect it
+      console.error('Login error:', err); 
+      console.log('Error response:', err.response); 
       setError(err.response?.data?.message || 'Invalid username or password.');
       setIsModalOpen(true); // Open modal on error
     }

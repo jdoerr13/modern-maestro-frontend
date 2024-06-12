@@ -9,7 +9,6 @@ describe('useLocalStorage', () => {
   it('should return initial value when there is no value in localStorage', () => {
     const { result } = renderHook(() => useLocalStorage('testKey', 'initialValue'));
 
-    // expect(result.current[0]).toBe('initialValue');
   });
 
   it('should set and retrieve a string value', () => {

@@ -119,10 +119,6 @@ const CompositionForm = ({ onCancel }) => {
         const updatedSelectedInstruments = [...selectedInstruments, instrument];
         setSelectedInstruments(updatedSelectedInstruments);
         
-        // For formData.instrumentation, ensure it also doesn't contain duplicates.
-        // Since it's possible formData.instrumentation and selectedInstruments
-        // could get out of sync, it's safe to derive the updated state from
-        // updatedSelectedInstruments directly.
         setFormData(formData => ({
             ...formData,
             instrumentation: updatedSelectedInstruments
@@ -217,12 +213,11 @@ const CompositionForm = ({ onCancel }) => {
   };
 
   const handleDeleteAudioFile = () => {
-    setAudioFile(null); // Removes the audio file from local state
-    // If needed, add API call here to remove the file from the backend
+    setAudioFile(null); 
   };
 
   const currentYear = new Date().getFullYear();
-  const earliestYear = 1900; // Adjust based on your requirements
+  const earliestYear = 1900; 
   const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
 
   return (
@@ -273,8 +268,8 @@ const CompositionForm = ({ onCancel }) => {
           name="duration"
           value={formData.duration}
           onChange={handleChange}
-          placeholder="MM:SS" // Guide text
-          pattern="(?:[0-5]?[0-9]):[0-5][0-9]" // Updated pattern
+          placeholder="MM:SS" 
+          pattern="(?:[0-5]?[0-9]):[0-5][0-9]" 
           title="Duration in minutes and seconds (MM:SS or M:SS)"
         />
       </div>
@@ -284,7 +279,7 @@ const CompositionForm = ({ onCancel }) => {
           id="instrumentation"
           name="instrumentation"
           multiple
-          value={formData.instrumentation} // Ensure formData.instrumentation is an array
+          value={formData.instrumentation} 
           onChange={(e) => handleInstrumentChange(e.target.selectedOptions)}
           onDoubleClick={(e) => handleInstrumentDoubleClick(e.target.value)}
         >
@@ -316,7 +311,7 @@ const CompositionForm = ({ onCancel }) => {
             <audio controls src={audioFile}>
               Your browser does not support the audio element.
             </audio>
-            <button onClick={handleDeleteAudioFile}>Delete Audio File</button> {/* Delete button */}
+            <button onClick={handleDeleteAudioFile}>Delete Audio File</button> 
           </div>
         )}
       </div>

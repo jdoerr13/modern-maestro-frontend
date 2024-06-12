@@ -7,7 +7,7 @@ function UpdateProfileForm({ contextUser, updateUserProfile }) {
     email: '',
     firstName: '',
     lastName: '',
-    password: '', // Keep password management as is
+    password: '', 
   });
 
   const [editing, setEditing] = useState({

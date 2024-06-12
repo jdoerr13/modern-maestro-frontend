@@ -4,7 +4,7 @@ import { UserProvider } from './auth/UserContext';
 import Navigation from "./routes-nav/Navigation"; 
 import CustomRoutes from "./routes-nav/Routes"; 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css'; // Assuming the CSS file is in the src folder
+import './App.css'; 
 
 
 function App() {

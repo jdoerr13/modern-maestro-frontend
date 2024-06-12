@@ -41,8 +41,8 @@ function SignupForm() {
       localStorage.removeItem('isComposer');
       navigate('/');
     } catch (err) {
-      console.error('Signup error:', err); // Log the error for debugging
-      console.log('Error response:', err.response); // Log the error response to inspect it
+      console.error('Signup error:', err); 
+      console.log('Error response:', err.response); 
       setError(err.response?.data?.message || 'Username or email allready exist. Please make sure password is five characters.');
       setIsModalOpen(true); // Open modal on error
     }

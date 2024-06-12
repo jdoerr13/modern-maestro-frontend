@@ -69,11 +69,11 @@
 }
 
 .greeting {
-  font-size: 4em; /* Adjust the size as needed */
+  font-size: 4em; 
   font-weight: bold;
-  color: #333; /* Adjust color if needed */
-  margin-top: 50px; /* Adjust spacing if needed */
-  text-align: center; /* Center the text */
+  color: #333; 
+  margin-top: 50px; 
+  text-align: center; 
 }
 
 @keyframes wave {
@@ -380,7 +380,7 @@ h2, p {
   margin-top: 20px;
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  width: 90%; /* Adjust this percentage to make it wider or narrower */
-  max-width: 1200px; /* Optional: limit the maximum width */
-  margin: 20px auto; /* Center the section */
+  width: 90%; 
+  max-width: 1200px; 
+  margin: 20px auto; 
 }
