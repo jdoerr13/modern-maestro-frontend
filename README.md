@@ -65,8 +65,8 @@ Features
         - Add tracks to the database.
         - Fetch a list of instruments.
 
-Deployment
-    [Deployed Site URL]
+Deployment:
+    [https://modernmaestro.netlify.app/]
 
 Tests
     Tests are located in the tests directory for both frontend and backend. To run the tests, use the following commands:

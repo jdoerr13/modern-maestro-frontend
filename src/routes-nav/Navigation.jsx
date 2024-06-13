@@ -19,7 +19,7 @@ function Navigation() {
         <div className="navbar-nav ml-md-auto">
           {user ? (
             <>
-               <div className="navbar-text animated-text">
+          <div className="navbar-text animated-text" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginRight: 'auto' }}>
                 Help us grow our database, click here <span className="arrow">→</span>
               </div>
               <NavLink className="nav-item nav-link" to="/composers">Composers</NavLink>

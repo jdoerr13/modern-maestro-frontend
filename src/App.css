@@ -34,7 +34,7 @@
   color: white;
   animation: horizontalSlide 3s infinite;
   position: absolute;
-  left: 67%;
+  left: 52%;
   transform: translateX(-50%);
 }
 
@@ -97,6 +97,7 @@
   margin-top: 20px;
   text-align: center;
   display: inline-block;
+  white-space: nowrap;
 
 }
 
@@ -297,6 +298,7 @@ h2, p {
   color: rgb(120, 66, 118);
   background-color: black;
 }
+
 
 .alert {
   padding: 15px;
