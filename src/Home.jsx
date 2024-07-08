@@ -76,7 +76,7 @@ function Home() {
         <>
         <h1 className="greeting">Welcome to Modern Maestro!</h1>
         <div style={{ fontSize: '1.7em', color: '#333', marginTop: '20px', textAlign: 'center', display: 'inline-block', whiteSpace: 'nowrap' }}>
-            <WaveText text="Explore the new world of classical music" />
+            <WaveText text="Explore&nbsp;the&nbsp;new&nbsp;world&nbsp;of&nbsp;classical&nbsp;music" />
           </div>
         <br></br>
         {/* Render buttons only if showForm is not set */}
