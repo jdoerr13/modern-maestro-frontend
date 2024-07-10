@@ -34,7 +34,7 @@
   color: white;
   animation: horizontalSlide 3s infinite;
   position: absolute;
-  left: 52%;
+  left: 62%;
   transform: translateX(-50%);
 }
 
