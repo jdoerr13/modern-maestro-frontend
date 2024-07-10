@@ -16,7 +16,10 @@ export const UserProvider = ({ children }) => {
     }
 
     const decodeAndFetchUser = async () => {
-      await decodeJWT();
+      const token = localStorage.getItem(TOKEN_STORAGE_ID);
+      if (token) {
+        await decodeJWT(token);
+      }
     };
   
     // Call the async function

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 //TO RUN APPLICATION- USE THIS
-const BASE_URL = import.meta.env.VITE_APP_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.NODE_ENV === 'development' ? "http://localhost:3000" : process.env.VITE_APP_BASE_URL;
 
 //TO RUN TEST- USE THIS:
 // const BASE_URL = process.env.VITE_APP_BASE_URL || "http://localhost:3000";
