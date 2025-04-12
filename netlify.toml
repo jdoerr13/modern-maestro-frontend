@@ -4,6 +4,6 @@
 
 [context.production.environment]
   VITE_APP_BASE_URL = "http://localhost:3000"
-  VITE_APP_BACKEND_URL = "https://modern-maestro-backend.onrender.com"
+  VITE_APP_BACKEND_URL = "https://modern-maestro-backend.fly.dev"
   VITE_SPOTIFY_CLIENT_ID = "your_spotify_client_id"
   VITE_SPOTIFY_CLIENT_SECRET = "your_spotify_client_secret"
