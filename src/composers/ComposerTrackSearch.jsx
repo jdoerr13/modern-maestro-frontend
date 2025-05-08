@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import ModernMaestroApi from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import './ComposerTrackSearch.css';
+
 
 function ComposerTrackSearch() {
   const [searchTerm, setSearchTerm] = useState('');
   const [tracks, setTracks] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [composerAdded, setComposerAdded] = useState(false);
-  const [composerFound, setComposerFound] = useState(false); // Track if a composer is found
+  const [composerFound, setComposerFound] = useState(false); 
   const [composerId, setComposerId] = useState(null);
   const navigate = useNavigate();
 
@@ -88,8 +90,9 @@ function ComposerTrackSearch() {
         compositionData.append("title", track.name);
         compositionData.append("composerId", composerId.toString());
         compositionData.append("duration", standardizeDuration(track.duration)); 
-        compositionData.append("year", track.year.toString());
-        compositionData.append("description", track.description);
+        compositionData.append("year", track.year ? track.year.toString() : '');
+        compositionData.append("description", typeof track.description === 'string' ? track.description : '');
+
 
         // Log data to be sent
         console.log(`Sending data for track: ${track.name}`, {
@@ -114,41 +117,76 @@ function ComposerTrackSearch() {
   };
 
   return (
-    <div className="main-content"> 
+    <div className="main-content">
       <h2>Search for a Composer's Music on Spotify Here</h2>
-      <input
-        type="text"
-        placeholder="Confirm Composer Here..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      {!composerFound && <button className="button" onClick={handleSearch}>Search</button>}
-      {errorMessage && <p>{errorMessage}</p>}
+  
+      {/* Group input + button */}
+      <div className="input-group">
+        <input
+          type="text"
+          placeholder="Confirm Composer Here..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {!composerFound && (
+          <button className="button" onClick={handleSearch}>
+            Search
+          </button>
+        )}
+      </div>
+  
+      {errorMessage && <p className="error">{errorMessage}</p>}
+  
       {composerFound && !composerAdded && (
-        <div>
-          <h3> Success! Composer {searchTerm} found </h3>
-          <button className="button" onClick={handleAddComposerToDatabase}>Please Add Composer to Database</button>
+        <div className="confirmation-block">
+          <h3>Success! Composer {searchTerm} found</h3>
+          <button className="button" onClick={handleAddComposerToDatabase}>
+            Please Add Composer to Database
+          </button>
         </div>
       )}
+  
       {composerAdded && (
         <div className="compositions-section">
           <h2>Compositions from {searchTerm}</h2>
-          <button className="button" onClick={handleAddAllTracksToDatabase}>Add All Tracks to Database</button>
-          {Array.isArray(tracks) && tracks.map((track, index) => (
-            <div key={index}>
-              <p><strong>Title:</strong> {track.name}</p>
-              <p><strong>Duration:</strong> {standardizeDuration(track.duration)}</p> 
-              <p><strong>Year:</strong> {track.year}</p>
-              <p><strong>Album:</strong> {track.album}</p>
-              {track.preview_url && (
-                <p><strong>Listen Here:</strong> <a href={track.preview_url} target="_blank" rel="noopener noreferrer">Preview</a></p>
-              )}
-            </div>
-          ))}
+          <button className="button" onClick={handleAddAllTracksToDatabase}>
+            Add All Tracks to Database
+          </button>
+  
+          {Array.isArray(tracks) &&
+            tracks.map((track, index) => (
+              <div key={index} className="track-card">
+                <p>
+                  <strong>Title:</strong> {track.name}
+                </p>
+                <p>
+                  <strong>Duration:</strong> {standardizeDuration(track.duration)}
+                </p>
+                <p>
+                  <strong>Year:</strong> {track.year}
+                </p>
+                <p>
+                  <strong>Album:</strong> {track.album}
+                </p>
+                {track.preview_url && (
+                  <p>
+                    <strong>Listen Here:</strong>{" "}
+                    <a
+                      href={track.preview_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Preview
+                    </a>
+                  </p>
+                )}
+              </div>
+            ))}
         </div>
       )}
     </div>
   );
+  
 }
 
 export default ComposerTrackSearch;

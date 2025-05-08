@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
-
 function UpdateProfileForm({ contextUser, updateUserProfile }) {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     firstName: '',
     lastName: '',
-    password: '', 
+    password: '',
   });
 
   const [editing, setEditing] = useState({
@@ -31,40 +30,29 @@ function UpdateProfileForm({ contextUser, updateUserProfile }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const toggleEdit = (field) => {
-    setEditing(prev => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
+    setEditing(prev => ({ ...prev, [field]: !prev[field] }));
   };
 
   const handleUpdate = async (field) => {
-    // Prevent update if the field is 'username' or password field is empty
-    if (field === 'username' || (field === 'password' && formData[field].trim() === '')) {
-      console.error("Attempted to update username or empty password.");
-      return;
-    }
+    if (field === 'username' || (field === 'password' && formData[field].trim() === '')) return;
     try {
-      await updateUserProfile({ [field]: formData[field] }); // Assume updateUserProfile can handle partial updates
-      toggleEdit(field); // Toggle edit mode off after update
-      console.log(`${field} updated successfully.`);
+      await updateUserProfile({ [field]: formData[field] });
+      toggleEdit(field);
     } catch (error) {
       console.error(`Failed to update ${field}:`, error.message);
     }
   };
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
+    <form className="spaced-stack" onSubmit={(e) => e.preventDefault()}>
       <h2>Update Profile</h2>
       {Object.keys(formData).map((field) => (
-        <div key={field}>
-          <label>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+        <div key={field} className="form-row">
+          <label><strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong></label>
           {editing[field] ? (
             <>
               <input
@@ -72,16 +60,21 @@ function UpdateProfileForm({ contextUser, updateUserProfile }) {
                 name={field}
                 value={formData[field]}
                 onChange={handleChange}
+                className="form-input"
                 autoFocus
               />
-              <button type="button" onClick={() => handleUpdate(field)}>Save</button>
-              <button type="button" onClick={() => toggleEdit(field)}>Cancel</button>
+              <div className="form-actions">
+                <button className="button" type="button" onClick={() => handleUpdate(field)}>Save</button>
+                <button className="button" type="button" onClick={() => toggleEdit(field)}>Cancel</button>
+              </div>
             </>
           ) : (
-            <>
-              <span>{formData[field]}</span>
-              {field !== 'username' && <button type="button" onClick={() => toggleEdit(field)}>Edit</button>}
-            </>
+            <div className="form-display">
+              <span>{field === 'password' ? '••••••' : formData[field]}</span>
+              {field !== 'username' && (
+                <button className="button" type="button" onClick={() => toggleEdit(field)}>Edit</button>
+              )}
+            </div>
           )}
         </div>
       ))}

@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { motion } from 'framer-motion';
 import UserContext from "./auth/UserContext";
-import LoginForm from './auth/LoginForm'; 
-import SignupForm from './auth/SignupForm'; 
+import LoginForm from './auth/LoginForm';
+import SignupForm from './auth/SignupForm';
 
 function WaveText({ text }) {
   return (
@@ -15,15 +15,17 @@ function WaveText({ text }) {
     </div>
   );
 }
-// Prepare audio
-const audio = new Audio('/sounds/orchestra-tuning.wav');
-
 
 function Home() {
-  const { user } = useContext(UserContext);
+  const audioRef = useRef(null);
+  const { user, setUser } = useContext(UserContext);
   const [greeting, setGreeting] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false); // State to manage if audio is playing
-  const [showForm, setShowForm] = useState(null); // State to manage which form to show
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showForm, setShowForm] = useState(null);
+
+  useEffect(() => {
+    audioRef.current = new Audio('/sounds/orchestra-tuning.wav');
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -33,8 +35,10 @@ function Home() {
     }
   }, [user]);
 
-  // Function to toggle sound play and pause
   const toggleSound = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
     if (!isPlaying) {
       audio.play().catch(error => console.error("Error playing the sound:", error));
     } else {
@@ -44,7 +48,7 @@ function Home() {
   };
 
   return (
-    <div className="Homepage" onClick={() => { if (!isPlaying) toggleSound(); }}>
+    <div className="Homepage">
       {user ? (
         <>
           <motion.h2
@@ -61,36 +65,43 @@ function Home() {
             transition={{ duration: 1.5 }}
             className="description"
           >
-          <WaveText text="Explore&nbsp;the&nbsp;new&nbsp;world&nbsp;of&nbsp;classical&nbsp;music" />
+            <WaveText text="Explore&nbsp;the&nbsp;new&nbsp;world&nbsp;of&nbsp;classical&nbsp;music" />
           </motion.div>
           <button onClick={toggleSound} style={{ marginTop: "20px" }}>
             {isPlaying ? "Stop Sound" : "Start your experience"}
           </button>
-            <div className="music-notes-container">
-              <div className="music-note">&#9835;</div>
-              <div className="music-note">&#9833;</div>
-              <div className="music-note">&#9834;</div>
-            </div>
+          <div className="music-notes-container">
+            <div className="music-note">&#9835;</div>
+            <div className="music-note">&#9833;</div>
+            <div className="music-note">&#9834;</div>
+          </div>
         </>
       ) : (
         <>
-        <h1 className="greeting">Welcome to Modern Maestro!</h1>
-        <div style={{ fontSize: '1.7em', color: '#333', marginTop: '20px', textAlign: 'center', display: 'inline-block', whiteSpace: 'nowrap' }}>
+          <h1 className="greeting">Welcome to Modern Maestro!</h1>
+          <div style={{ fontSize: '1.7em', color: '#333', marginTop: '20px', textAlign: 'center', display: 'inline-block', whiteSpace: 'nowrap' }}>
             <WaveText text="Explore&nbsp;the&nbsp;new&nbsp;world&nbsp;of&nbsp;classical&nbsp;music" />
           </div>
-        <br></br>
-        {/* Render buttons only if showForm is not set */}
-        {!showForm && (
-          <div>
-            <button onClick={() => setShowForm('login')} className="link-button">Log in</button>
-            <button onClick={() => setShowForm('signup')} className="link-button">Sign up</button>
+          <br />
+          {!showForm && (
+            <div>
+              <button onClick={() => setShowForm('login')} className="link-button">Log in</button>
+              <button onClick={() => setShowForm('signup')} className="link-button">Sign up</button>
+              <div style={{ marginTop: "1rem" }}>
+              <button
+                onClick={() => setUser({ username: "DemoUser", email: "demo@user.com" })}
+                className="link-button zoom-animation"
+              >
+                Bypass Login (Demo)
+              </button>
+              </div>
+            </div>
+          )}
+          <div className="form-wrapper">
+            {showForm === 'login' && <LoginForm />}
+            {showForm === 'signup' && <SignupForm />}
           </div>
-        )}
-      <div className="form-wrapper">
-          {showForm === 'login' && <LoginForm />}
-          {showForm === 'signup' && <SignupForm />}
-        </div>
-      </>
+        </>
       )}
     </div>
   );

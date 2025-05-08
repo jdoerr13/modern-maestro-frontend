@@ -221,106 +221,136 @@ const CompositionForm = ({ onCancel }) => {
   const years = Array.from({length: currentYear - earliestYear + 1}, (v, k) => currentYear - k);
 
   return (
-    <form className="main-content" onSubmit={handleSubmit}>
+    <form className="main-content spaced-stack" onSubmit={handleSubmit}>
       {composerName && (
-        <div>
-          <h2>Add New Composition for {composerName}</h2>
-        </div>
+        <h2 className="swoopIn" style={{ textAlign: 'center' }}>
+          Add New Composition for {composerName}
+        </h2>
       )}
-      <div>
-        <label htmlFor="title">Title: &nbsp;</label>
+  
+      <div className="form-group">
+        <label htmlFor="title">Title:</label>
         <input
           id="title"
           name="title"
           value={formData.title}
           onChange={handleChange}
           required
+          className="form-control"
         />
       </div>
-      <div>
-        <label htmlFor="year_of_composition">Year Composed:&nbsp; </label>
+  
+      <div className="form-group">
+        <label htmlFor="year_of_composition">Year Composed:</label>
         <select
           id="year_of_composition"
           name="year_of_composition"
           value={formData.year_of_composition}
           onChange={handleChange}
           required
+          className="form-control"
         >
           <option value="">Select a Year</option>
-          {years.map(year => (
+          {years.map((year) => (
             <option key={year} value={year}>{year}</option>
           ))}
         </select>
       </div>
-      <div>
-        <label htmlFor="description">Description:&nbsp;</label>
+  
+      <div className="form-group">
+        <label htmlFor="description">Description:</label>
         <textarea
           id="description"
           name="description"
           value={formData.description}
           onChange={handleChange}
+          className="form-control"
         />
       </div>
-      <div>
-        <label htmlFor="duration">Duration: &nbsp;</label>
+  
+      <div className="form-group">
+        <label htmlFor="duration">Duration (MM:SS):</label>
         <input
           id="duration"
           name="duration"
           value={formData.duration}
           onChange={handleChange}
-          placeholder="MM:SS" 
-          pattern="(?:[0-5]?[0-9]):[0-5][0-9]" 
-          title="Duration in minutes and seconds (MM:SS or M:SS)"
+          placeholder="MM:SS"
+          pattern="(?:[0-5]?[0-9]):[0-5][0-9]"
+          title="Format MM:SS or M:SS"
+          className="form-control"
         />
       </div>
-      <div>
-        <label htmlFor="instrumentation">Instrumentation: &nbsp;</label>
+  
+      <div className="form-group">
+        <label htmlFor="instrumentation">Instrumentation:</label>
         <select
           id="instrumentation"
           name="instrumentation"
           multiple
-          value={formData.instrumentation} 
+          value={formData.instrumentation}
           onChange={(e) => handleInstrumentChange(e.target.selectedOptions)}
           onDoubleClick={(e) => handleInstrumentDoubleClick(e.target.value)}
+          className="form-control"
         >
-          {instrumentList.map(instrument => (
+          {instrumentList.map((instrument) => (
             <option key={instrument} value={instrument}>{instrument}</option>
           ))}
         </select>
       </div>
-      <div>
-        <label>Selected Instruments: &nbsp;</label>
-        {renderSelectedInstruments()}
+  
+      <div className="form-group">
+        <label>Selected Instruments:</label>
         <ul>
           {selectedInstruments.map((instrument, index) => (
-            <li key={index}>{instrument}</li>
+            <li key={index}>
+              {instrument}
+              <button
+                type="button"
+                className="button"
+                style={{ marginLeft: '0.5rem' }}
+                onClick={() => handleRemoveInstrument(instrument)}
+              >
+                Remove
+              </button>
+            </li>
           ))}
         </ul>
       </div>
-      <div>
-        <label htmlFor="audioFile" className="file-upload-label">Choose File: &nbsp;</label>
+  
+      <div className="form-group">
+        <label htmlFor="audioFile">Audio File:</label>
         <input
           type="file"
           id="audioFile"
           name="audioFile"
           onChange={handleFileChange}
           accept="audio/*"
+          className="form-control"
         />
         {isEditing && audioFile && (
-          <div>
-            <audio controls src={audioFile}>
-              Your browser does not support the audio element.
-            </audio>
-            <button onClick={handleDeleteAudioFile}>Delete Audio File</button> 
+          <div style={{ marginTop: '1rem' }}>
+            <audio controls src={audioFile} style={{ width: '100%' }} />
+            <button type="button" onClick={handleDeleteAudioFile} className="button" style={{ marginTop: '0.5rem' }}>
+              Delete Audio File
+            </button>
           </div>
         )}
       </div>
-      <button className="button" type="submit">{isEditing ? 'Update Composition' : 'Add Composition'}</button>
-      &nbsp;
-      <button className="button" type="button" onClick={handleCancel}>Cancel</button>
-      {errors.submit && <div>{errors.submit}</div>}
+  
+      <div className="form-group" style={{ textAlign: 'center' }}>
+        <button className="button" type="submit">
+          {isEditing ? 'Update Composition' : 'Add Composition'}
+        </button>
+        &nbsp;
+        <button className="button" type="button" onClick={handleCancel}>
+          Cancel
+        </button>
+      </div>
+  
+      {errors.submit && <div className="error">{errors.submit}</div>}
     </form>
-  );
+  );  
 };
 
 export default CompositionForm;

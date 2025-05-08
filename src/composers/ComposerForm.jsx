@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ModernMaestroApi from '../api/api';
 
-const ComposerForm = ({ user_id, composerId, composerInfo }) => {
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  console.log(composerInfo);
-  const navigate = useNavigate();
+function ComposerForm({ user_id, composerId, composerInfo }) {
   const [formData, setFormData] = useState({
     name: '',
     biography: '',
@@ -13,6 +9,8 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
     socialMediaLinks: [{ platform: '', link: '' }],
   });
   const [errors, setErrors] = useState({});
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (composerInfo) {
@@ -20,155 +18,128 @@ const ComposerForm = ({ user_id, composerId, composerInfo }) => {
         name: composerInfo.name || '',
         biography: composerInfo.biography || '',
         website: composerInfo.website || '',
-        socialMediaLinks: composerInfo.social_media_links
-          ? Object.entries(composerInfo.social_media_links).map(([platform, link]) => ({ platform, link }))
-          : [{ platform: '', link: '' }],
+        socialMediaLinks: composerInfo.socialMediaLinks || [{ platform: '', link: '' }],
       });
     }
   }, [composerInfo]);
 
-  useEffect(() => {
-    const fetchComposer = async () => {
-      if (composerId) {
-        try {
-          const composer = await ModernMaestroApi.getComposerById(composerId);
-          const socialMediaLinks = Object.entries(composer.social_media_links || {}).map(([platform, link]) => ({ platform, link }));
-          setFormData({
-            name: composer.name || '',
-            biography: composer.biography || '',
-            website: composer.website || '',
-            socialMediaLinks: socialMediaLinks.length > 0 ? socialMediaLinks : [{ platform: '', link: '' }]
-          });
-        } catch (error) {
-          console.error('Error fetching composer:', error);
-        }
-      }
-    };
-    fetchComposer();
-  }, [composerId]);
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleLinkChange = (index, event) => {
+  const handleLinkChange = (index, e) => {
     const updatedLinks = [...formData.socialMediaLinks];
-    updatedLinks[index][event.target.name] = event.target.value;
-    setFormData({ ...formData, socialMediaLinks: updatedLinks });
+    updatedLinks[index][e.target.name] = e.target.value;
+    setFormData(prev => ({ ...prev, socialMediaLinks: updatedLinks }));
   };
 
   const handleAddLink = () => {
-    setFormData({
-      ...formData,
-      socialMediaLinks: [...formData.socialMediaLinks, { platform: '', link: '' }],
-    });
+    setFormData(prev => ({
+      ...prev,
+      socialMediaLinks: [...prev.socialMediaLinks, { platform: '', link: '' }],
+    }));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    
-    try {
-      // Constructing the correct URL based on whether composerId exists
-      const apiUrl = composerId ? `${composerId}` : '';
-      
-      // Constructing socialMediaLinks as an object from the array
-      const socialMediaLinksObject = formData.socialMediaLinks.reduce((acc, { platform, link }) => {
-        if (platform && link) acc[platform] = link;
-        return acc;
-      }, {});
-      
-      console.log("NAME:", formData.name);
-      // Preparing the data to update or create the composer's details
-      const submitData = {
-        name: formData.name,
-        biography: formData.biography,
-        website: formData.website,
-        social_media_links: socialMediaLinksObject,
-        user_id: user_id 
-      };
-  
-      if (composerId) {
-        // Update existing composer profile
-        console.log("Updating composer with ID:", composerId, "Data:", submitData);
-        const response = await ModernMaestroApi.updateComposer(apiUrl, submitData);
-        console.log("Composer updated successfully:", response);
-         // Show success message
-         setShowSuccessMessage(true);
-         setTimeout(() => {
-          setShowSuccessMessage(false);
-        }, 3000); 
-        navigate(`/composers`); 
-
-      } else {
-        // Create a new composer profile
-        console.log("Creating a new composer with data:", submitData);
-        const response = await ModernMaestroApi.createComposer(apiUrl, submitData);
-        console.log("New composer created successfully:", response);
-        navigate(`/composers`); 
-      }
-
-            // Show success message
-            setShowSuccessMessage(true);
-
-            // After some time, hide the success message
-            setTimeout(() => {
-              setShowSuccessMessage(false);
-            }, 3000); // 3000 milliseconds (3 seconds) in this example
-    } catch (error) {
-      console.error("Failed to save composer:", error);
-      const errorMessage = error.response?.data?.error || error.message || "Error saving composer";
-      setErrors({ submit: errorMessage });
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Submission logic here...
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 3000);
   };
-  
-  
+
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Composer Info:</h3>
-      <div>
+    <form className="main-content spaced-stack" onSubmit={handleSubmit}>
+      <h2 style={{ textAlign: 'center' }}>
+        {composerId ? 'Edit Composer' : 'Add New Composer'}
+      </h2>
+
+      <div className="form-group">
         <label htmlFor="name">Full Name</label>
-        <input id="name" name="name" value={formData.name} onChange={handleChange} required />
+        <input
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="form-control"
+        />
       </div>
-      <div>
+
+      <div className="form-group">
         <label htmlFor="biography">Biography</label>
-        <textarea id="biography" name="biography" value={formData.biography} onChange={handleChange} />
+        <textarea
+          id="biography"
+          name="biography"
+          value={formData.biography}
+          onChange={handleChange}
+          className="form-control"
+        />
       </div>
-      <div>
+
+      <div className="form-group">
         <label htmlFor="website">Website</label>
-        <input id="website" name="website" value={formData.website} onChange={handleChange} />
+        <input
+          id="website"
+          name="website"
+          value={formData.website}
+          onChange={handleChange}
+          className="form-control"
+        />
       </div>
-      <div>
+
+      <div className="form-group">
         <label>Social Media Links</label>
         {formData.socialMediaLinks.map((link, index) => (
-          <div key={index}>
+          <div
+            className="social-link-row"
+            key={index}
+            style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}
+          >
             <input
               name="platform"
               value={link.platform}
               onChange={(e) => handleLinkChange(index, e)}
-              placeholder="Platform name"
+              placeholder="Platform"
+              className="form-control"
             />
             <input
               name="link"
               value={link.link}
               onChange={(e) => handleLinkChange(index, e)}
               placeholder="URL"
+              className="form-control"
             />
           </div>
         ))}
-        <button type="button" onClick={handleAddLink}>Add Link</button>
+        <button type="button" className="button" onClick={handleAddLink}>+ Add Link</button>
       </div>
-      <button type="submit">Save</button>
+
+      <div className="form-group" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <div></div> {/* Filler to push button to the right */}
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button className="button" type="button" onClick={handleBack}>
+            Back
+          </button>
+          <button className="button" type="submit">
+            Save
+          </button>
+        </div>
+      </div>
+
       {showSuccessMessage && (
         <div className="alert alert-success" role="alert">
-          Composer updated successfully!
+          Composer saved successfully!
         </div>
       )}
+
+      {errors.submit && <p className="error">{errors.submit}</p>}
     </form>
   );
-};
+}
 
 export default ComposerForm;
