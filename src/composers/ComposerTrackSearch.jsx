@@ -121,20 +121,23 @@ function ComposerTrackSearch() {
       <h2>Search for a Composer's Music on Spotify Here</h2>
   
       {/* Group input + button */}
-      <div className="input-group">
-        <input
-          type="text"
-          placeholder="Confirm Composer Here..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        {!composerFound && (
-          <button className="button" onClick={handleSearch}>
-            Search
-          </button>
-        )}
-      </div>
-  
+      <div className="centered-input">
+  <input
+    type="text"
+    placeholder="Confirm Composer Here..."
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+  />
+  {!composerFound && (
+    <div className="centered-button">
+      <button className="button" onClick={handleSearch}>
+        SEARCH
+      </button>
+    </div>
+  )}
+</div>
+
+        
       {errorMessage && <p className="error">{errorMessage}</p>}
   
       {composerFound && !composerAdded && (
